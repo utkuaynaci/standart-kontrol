@@ -9,7 +9,7 @@ from datetime import datetime
 app = Flask(__name__)
 standards_store = {}
 
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 
 def parse_excel(file):
     df = pd.read_excel(file, header=None)
@@ -124,12 +124,16 @@ SADECE JSON formatında yanıt ver, başka hiçbir şey yazma:
 
     try:
         res = requests.post(
-            f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={GEMINI_API_KEY}',
-            headers={'Content-Type': 'application/json'},
+            'https://api.openai.com/v1/chat/completions',
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {OPENAI_API_KEY}'
+            },
             json={
-                'contents': [{'parts': [{'text': prompt}]}],
-                'tools': [{'google_search': {}}],
-                'generationConfig': {'temperature': 0.1, 'maxOutputTokens': 800}
+                'model': 'gpt-4o-mini',
+                'messages': [{'role': 'user', 'content': prompt}],
+                'temperature': 0.1,
+                'max_tokens': 800
             },
             timeout=30
         )
@@ -139,10 +143,7 @@ SADECE JSON formatında yanıt ver, başka hiçbir şey yazma:
             return jsonify({'error': str(err)}), 400
 
         result = res.json()
-        text = ''
-        for part in result.get('candidates', [{}])[0].get('content', {}).get('parts', []):
-            if 'text' in part:
-                text += part['text']
+        text = result['choices'][0]['message']['content']
 
         clean = text.replace('```json', '').replace('```', '').strip()
 
