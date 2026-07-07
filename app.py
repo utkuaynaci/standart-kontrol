@@ -146,8 +146,18 @@ SADECE JSON formatında yanıt ver, başka hiçbir şey yazma:
         result = res.json()
         text = ''.join(b['text'] for b in result['content'] if b['type'] == 'text')
 
+        # cite tag'lerini ve sistem etiketlerini temizle
+        import re
+        text = re.sub(r'<cite[^>]*>', '', text)
+        text = re.sub(r'</cite>', '', text)
+        text = re.sub(r'<[^>]+>', '', text)
+
         clean = text.replace('```json', '').replace('```', '').strip()
 
+        # JSON bloğunu metinden çıkar
+        json_match = re.search(r'\{[\s\S]*\}', clean)
+        if json_match:
+            clean = json_match.group(0)
         try:
             parsed = json.loads(clean)
         except:
