@@ -8,13 +8,10 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a18; min-height: 100vh; }
   .topbar { background: #1a1a18; color: #fff; padding: 14px 32px; display: flex; align-items: center; gap: 12px; }
-  .topbar-icon { width: 28px; height: 28px; background: #22c55e; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+  .topbar-icon { width: 28px; height: 28px; background: #4a9eff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
   .topbar h1 { font-size: 15px; font-weight: 500; }
-  .topbar-badge { margin-left: auto; background: #22c55e22; border: 1px solid #22c55e55; color: #22c55e; font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+  .topbar-badge { margin-left: auto; background: #4a9eff22; border: 1px solid #4a9eff55; color: #4a9eff; font-size: 11px; padding: 3px 10px; border-radius: 20px; }
   .main { max-width: 1100px; margin: 0 auto; padding: 28px 24px; }
-
-  .info-bar { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #92400e; display: flex; gap: 10px; align-items: flex-start; line-height: 1.6; }
-
   .upload-area { background: #fff; border: 2px dashed #ccc; border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
   .upload-area:hover { border-color: #4a9eff; background: #f0f7ff; }
   .upload-area.loaded { border-color: #22c55e; background: #f0fdf4; border-style: solid; cursor: default; }
@@ -22,15 +19,14 @@
   .upload-area p { font-size: 13px; color: #666; }
   .upload-icon { font-size: 36px; margin-bottom: 10px; }
   #fileInput { display: none; }
-
-  .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
+  .stats { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 16px; }
   .stat { background: #fff; border-radius: 10px; padding: 12px 16px; border: 1px solid #e5e5e3; }
   .stat-label { font-size: 11px; color: #888; margin-bottom: 4px; }
-  .stat-value { font-size: 26px; font-weight: 600; }
+  .stat-value { font-size: 24px; font-weight: 600; }
   .stat-value.red { color: #ef4444; }
   .stat-value.green { color: #22c55e; }
   .stat-value.amber { color: #f59e0b; }
-
+  .stat-value.blue { color: #3b82f6; }
   .controls { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
   button { padding: 8px 14px; border-radius: 8px; border: 1px solid #d1d1cf; background: #fff; font-size: 13px; cursor: pointer; font-family: inherit; color: #1a1a18; transition: all 0.15s; }
   button:hover:not(:disabled) { background: #f5f5f3; }
@@ -42,11 +38,9 @@
   .filter-btns { display: flex; gap: 5px; margin-left: auto; flex-wrap: wrap; }
   .filter-btn { padding: 5px 11px; border-radius: 20px; font-size: 12px; border: 1px solid #e5e5e3; background: #fff; cursor: pointer; }
   .filter-btn.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
-
   .progress-wrap { background: #e5e5e3; border-radius: 4px; height: 4px; margin-bottom: 6px; overflow: hidden; display: none; }
-  .progress-bar { height: 100%; background: #22c55e; border-radius: 4px; transition: width 0.3s; }
+  .progress-bar { height: 100%; background: #4a9eff; border-radius: 4px; transition: width 0.3s; }
   .progress-label { font-size: 12px; color: #666; margin-bottom: 12px; display: none; }
-
   .table-wrap { background: #fff; border-radius: 12px; border: 1px solid #e5e5e3; overflow: hidden; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   thead th { background: #f8f8f6; padding: 9px 14px; text-align: left; font-weight: 500; font-size: 11px; color: #666; border-bottom: 1px solid #e5e5e3; text-transform: uppercase; letter-spacing: .03em; }
@@ -55,35 +49,39 @@
   tbody tr:hover { background: #fafaf8; }
   tbody tr.row-update { background: #fff8f8; }
   tbody tr.row-current { background: #f8fff8; }
-
   .std-code { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; font-weight: 600; }
   .std-name { font-size: 12px; color: #666; margin-top: 3px; line-height: 1.4; }
-
   .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
   .badge-pending  { background: #f5f5f3; color: #888; border: 1px solid #e5e5e3; }
-  .badge-opened   { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+  .badge-checking { background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe; }
   .badge-current  { background: #f0fdf4; color: #22c55e; border: 1px solid #bbf7d0; }
   .badge-update   { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; }
-
-  .search-links { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
-  .search-link { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 6px; font-size: 11px; text-decoration: none; border: 1px solid #e5e5e3; color: #444; background: #f8f8f6; transition: all 0.15s; }
-  .search-link:hover { background: #eee; border-color: #ccc; }
-
-  .mark-btns { display: flex; gap: 5px; margin-top: 5px; align-items: center; }
-  .mark-btn { padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; border: 1px solid #e5e5e3; background: #fff; font-family: inherit; transition: all 0.15s; }
-  .mark-btn.green:hover { background: #f0fdf4; border-color: #bbf7d0; color: #16a34a; }
-  .mark-btn.red:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
-  .mark-btn.reset { font-size: 10px; color: #aaa; }
-
-  .note-input { border: 1px solid #e5e5e3; border-radius: 6px; padding: 4px 8px; font-size: 12px; font-family: inherit; color: #555; width: 220px; margin-top: 5px; }
-  .note-input:focus { outline: none; border-color: #4a9eff; }
-
+  .badge-unknown  { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+  .result-box { margin-top: 5px; }
+  .result-ver { font-size: 12px; font-weight: 500; margin-bottom: 3px; }
+  .result-detail { font-size: 12px; color: #555; line-height: 1.5; margin-bottom: 4px; max-width: 400px; }
+  .history-wrap { margin-top: 5px; }
+  .history-title { font-size: 10px; font-weight: 500; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .03em; }
+  .history-timeline { display: flex; flex-wrap: wrap; align-items: center; gap: 0; }
+  .history-ver { display: inline-flex; flex-direction: column; align-items: center; }
+  .history-dot-wrap { display: flex; align-items: center; }
+  .history-dot { width: 8px; height: 8px; border-radius: 50%; background: #d1d5db; border: 2px solid #9ca3af; flex-shrink: 0; }
+  .history-dot.latest { background: #3b82f6; border-color: #1d4ed8; }
+  .history-dot.ours   { background: #f59e0b; border-color: #d97706; }
+  .history-line { width: 16px; height: 2px; background: #e5e7eb; }
+  .history-label { font-size: 10px; color: #888; margin-top: 2px; white-space: nowrap; }
+  .history-label.bold { color: #1a1a18; font-weight: 600; }
+  .result-link { font-size: 12px; color: #4a9eff; text-decoration: none; display: inline-block; margin-top: 3px; }
+  .result-link:hover { text-decoration: underline; }
   .empty { text-align: center; padding: 60px 20px; color: #aaa; }
   .empty-icon { font-size: 44px; margin-bottom: 10px; }
   .empty h3 { font-size: 15px; color: #888; margin-bottom: 5px; }
-
+  .log-box { background: #1a1a18; color: #aaa; font-family: monospace; font-size: 12px; padding: 12px 16px; border-radius: 8px; margin-top: 12px; max-height: 140px; overflow-y: auto; display: none; line-height: 1.9; }
+  .log-box .ok   { color: #22c55e; }
+  .log-box .warn { color: #f59e0b; }
+  .log-box .err  { color: #ef4444; }
+  .log-box .info { color: #60a5fa; }
   .toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a18; color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; display: none; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
-
   @media (max-width:700px) {
     .stats { grid-template-columns: repeat(2,1fr); }
     .controls { flex-direction: column; align-items: stretch; }
@@ -92,283 +90,236 @@
 </style>
 </head>
 <body>
-
 <div class="topbar">
   <div class="topbar-icon">📋</div>
   <h1>Standart Güncelleme Denetleyici</h1>
-  <span class="topbar-badge">✓ Ücretsiz</span>
+  <span class="topbar-badge">⚡ Otomatik</span>
 </div>
-
 <div class="main">
-
-  <div class="info-bar">
-    <span style="font-size:18px">💡</span>
-    <div>
-      <strong>Nasıl çalışır?</strong> Excel'inizi yükleyin → her standart için arama linklerine tıklayın → sonucu <b>Güncel</b> veya <b>Güncelleme Var</b> olarak işaretleyin → Excel'e aktarın. Tamamen ücretsiz.
-    </div>
-  </div>
-
-  <!-- Upload -->
   <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
     <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="uploadFile(event)">
     <div class="upload-icon">📂</div>
     <h2>Excel dosyanızı buraya tıklayın veya sürükleyin</h2>
     <p>Standart NO sütunu otomatik algılanır · .xlsx ve .xls desteklenir</p>
   </div>
-
-  <!-- Stats -->
   <div class="stats" id="statsRow" style="display:none">
     <div class="stat"><div class="stat-label">Toplam</div><div class="stat-value" id="statTotal">0</div></div>
     <div class="stat"><div class="stat-label">Güncelleme Var</div><div class="stat-value red" id="statUpdate">0</div></div>
     <div class="stat"><div class="stat-label">Güncel</div><div class="stat-value green" id="statCurrent">0</div></div>
+    <div class="stat"><div class="stat-label">Geçmiş Var</div><div class="stat-value blue" id="statHistory">0</div></div>
     <div class="stat"><div class="stat-label">Bekleyen</div><div class="stat-value amber" id="statPending">0</div></div>
   </div>
-
-  <!-- Controls -->
   <div class="controls" id="controlsRow" style="display:none">
-    <button class="primary" onclick="openBatch()">📋 Sonraki 10 Standardı İşaretle</button>
+    <button class="primary" id="startBtn" onclick="startCheck()">🔍 Tümünü Otomatik Kontrol Et</button>
+    <button id="stopBtn" onclick="stopCheck()" disabled>⏹ Durdur</button>
     <button id="exportBtn" onclick="exportExcel()" disabled>⬇️ Excel'e Aktar</button>
     <button class="danger-btn" onclick="resetAll()">🗑 Sıfırla</button>
     <div class="filter-btns">
       <button class="filter-btn active" onclick="setFilter('all',this)">Tümü</button>
       <button class="filter-btn" onclick="setFilter('update',this)">Güncelleme Var</button>
       <button class="filter-btn" onclick="setFilter('current',this)">Güncel</button>
+      <button class="filter-btn" onclick="setFilter('history',this)">Geçmiş Var</button>
       <button class="filter-btn" onclick="setFilter('pending',this)">Bekleyen</button>
     </div>
   </div>
-
   <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
   <div class="progress-label" id="progressLabel"></div>
-
-  <!-- Table -->
   <div class="table-wrap" id="tableWrap" style="display:none">
     <table>
       <thead>
         <tr>
           <th style="width:20%">Standart No</th>
-          <th style="width:25%">Standart Adı</th>
-          <th style="width:11%">Listedeki Tarih</th>
-          <th style="width:44%">Arama & Durum</th>
+          <th style="width:22%">Standart Adı</th>
+          <th style="width:10%">Listedeki Tarih</th>
+          <th style="width:48%">Kontrol Sonucu & Versiyon Geçmişi</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
     </table>
   </div>
-
   <div class="empty" id="emptyMsg">
     <div class="empty-icon">🗂️</div>
     <h3>Henüz dosya yüklenmedi</h3>
     <p>Excel dosyanızı yükleyerek başlayın</p>
   </div>
-
+  <div class="log-box" id="logBox"></div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script>
-let sessionId = null;
-let standards = [];
-let activeFilter = 'all';
+let sessionId=null, standards=[], activeFilter='all', running=false, shouldStop=false;
 
-// Drag & drop
-const ua = document.getElementById('uploadArea');
-ua.addEventListener('dragover', e => { e.preventDefault(); ua.style.borderColor='#4a9eff'; });
-ua.addEventListener('dragleave', () => ua.style.borderColor='');
-ua.addEventListener('drop', e => {
-  e.preventDefault(); ua.style.borderColor='';
-  const file = e.dataTransfer.files[0];
-  if (file) doUpload(file);
-});
+const ua=document.getElementById('uploadArea');
+ua.addEventListener('dragover',e=>{e.preventDefault();ua.style.borderColor='#4a9eff';});
+ua.addEventListener('dragleave',()=>ua.style.borderColor='');
+ua.addEventListener('drop',e=>{e.preventDefault();ua.style.borderColor='';doUpload(e.dataTransfer.files[0]);});
+function uploadFile(e){doUpload(e.target.files[0]);}
 
-function uploadFile(e) { doUpload(e.target.files[0]); }
-
-async function doUpload(file) {
-  const fd = new FormData();
-  fd.append('file', file);
+async function doUpload(file){
+  const fd=new FormData(); fd.append('file',file);
   try {
-    const res = await fetch('/upload', { method: 'POST', body: fd });
-    const data = await res.json();
-    if (data.error) { alert('Hata: ' + data.error); return; }
-    sessionId = data.session_id;
-    standards = data.standards;
+    const res=await fetch('/upload',{method:'POST',body:fd});
+    const data=await res.json();
+    if(data.error){alert('Hata: '+data.error);return;}
+    sessionId=data.session_id; standards=data.standards;
     ua.classList.add('loaded');
-    ua.innerHTML = `<div class="upload-icon">✅</div><h2>${file.name}</h2><p>${standards.length} standart yüklendi</p>`;
-    show();
-    toast(`✓ ${standards.length} standart yüklendi`);
-  } catch(e) { alert('Yükleme hatası: ' + e.message); }
+    ua.innerHTML=`<div class="upload-icon">✅</div><h2>${file.name}</h2><p>${standards.length} standart yüklendi · Otomatik kontrol için butona basın</p>`;
+    document.getElementById('logBox').style.display='block';
+    show(); toast(`✓ ${standards.length} standart yüklendi`);
+  } catch(e){alert('Yükleme hatası: '+e.message);}
 }
 
-function show() {
-  document.getElementById('statsRow').style.display = 'grid';
-  document.getElementById('controlsRow').style.display = 'flex';
-  document.getElementById('tableWrap').style.display = 'block';
-  document.getElementById('emptyMsg').style.display = 'none';
-  renderTable(); updateStats(); updateProgress();
+function show(){
+  document.getElementById('statsRow').style.display='grid';
+  document.getElementById('controlsRow').style.display='flex';
+  document.getElementById('tableWrap').style.display='block';
+  document.getElementById('emptyMsg').style.display='none';
+  renderTable();updateStats();
 }
 
-function buildLinks(s) {
-  const links = [];
-  const up = s.no.toUpperCase();
-  const cleanNo = s.no.replace(/^TSE?\s+(CEN\s+)?|^TS\s+(EN\s+)?(ISO\s+|IEC\s+)?|^EN\s+(ISO\s+|IEC\s+)?/i, '').trim();
-
-  if (up.startsWith('TS') || up.startsWith('TSE')) {
-    links.push({ label: '\uD83D\uDD0D TSE', url: 'https://intweb.tse.org.tr/Standard/Standard/StandardAra.aspx?sira=1&durum=1&q=' + encodeURIComponent(s.no) });
+function buildResultHtml(s){
+  const badges={
+    pending:'<span class="badge badge-pending">⏳ Bekliyor</span>',
+    checking:'<span class="badge badge-checking">🔄 Sorgulanıyor...</span>',
+    current:'<span class="badge badge-current">✅ Güncel</span>',
+    update:'<span class="badge badge-update">⚠️ Güncelleme Var</span>',
+    unknown:'<span class="badge badge-unknown">❓ Bulunamadı</span>'
+  };
+  const badge=badges[s.status]||badges.pending;
+  if(s.status==='pending'||s.status==='checking') return badge;
+  let html=`<div class="result-box">${badge}`;
+  if(s.currentVer) html+=`<div class="result-ver">Güncel versiyon: ${esc(s.currentVer)}</div>`;
+  if(s.note) html+=`<div class="result-detail">${esc(s.note)}</div>`;
+  if(s.history&&s.history.length>0){
+    html+=`<div class="history-wrap"><div class="history-title">📅 Versiyon geçmişi (${s.history.length})</div><div class="history-timeline">`;
+    s.history.forEach((ver,i)=>{
+      const isLast=i===s.history.length-1;
+      const isOurs=s.tarih&&ver.year&&(ver.year===s.tarih||ver.year.includes(s.tarih.substring(0,4)));
+      const dc='history-dot'+(isLast?' latest':isOurs?' ours':'');
+      const lc='history-label'+(isLast||isOurs?' bold':'');
+      html+=`<div class="history-ver"><div class="history-dot-wrap"><div class="${dc}"></div>${!isLast?'<div class="history-line"></div>':''}</div><div class="${lc}">${esc(ver.year)}</div></div>`;
+    });
+    html+=`</div></div>`;
   }
-  if (up.includes('ISO')) {
-    links.push({ label: '\uD83D\uDD0D ISO', url: 'https://www.iso.org/search.html#q=' + encodeURIComponent(cleanNo) + '&sort=rel&p=1' });
-  }
-  if (up.includes('IEC')) {
-    links.push({ label: '\uD83D\uDD0D IEC', url: 'https://www.iec.ch/searchpub/cur_fut_pa.htm?searchfor=' + encodeURIComponent(cleanNo) + '&search_type=ref_no' });
-  }
-  if (up.startsWith('EN ') && !up.includes('ISO') && !up.includes('IEC')) {
-    links.push({ label: '\uD83D\uDD0D EUR-Lex', url: 'https://eur-lex.europa.eu/search.html?text=' + encodeURIComponent(s.no) + '&scope=EURLEX&type=quick' });
-  }
-  if (up.includes('MDCG')) {
-    links.push({ label: '\uD83D\uDD0D MDCG', url: 'https://ec.europa.eu/health/md_sector/new_regulations/guidance_en' });
-  }
-  if (up.includes('IMDRF') || up.includes('GHTF')) {
-    links.push({ label: '\uD83D\uDD0D IMDRF', url: 'https://www.imdrf.org/documents/library' });
-  }
-  if (up.includes('IAF')) {
-    links.push({ label: '\uD83D\uDD0D IAF', url: 'https://www.iaf.nu/articles/Publications/6' });
-  }
-  if (up.startsWith('EA ') || up.startsWith('EA-')) {
-    links.push({ label: '\uD83D\uDD0D EA', url: 'https://european-accreditation.org/publications-and-news/ea-publications/' });
-  }
-  if (up.includes('ILAC')) {
-    links.push({ label: '\uD83D\uDD0D ILAC', url: 'https://ilac.org/publications-and-resources/' });
-  }
-  if (links.length === 0) {
-    links.push({ label: '\uD83D\uDD0D TSE', url: 'https://intweb.tse.org.tr/Standard/Standard/StandardAra.aspx?sira=1&durum=1&q=' + encodeURIComponent(s.no) });
-  }
-  return links;
+  if(s.url) html+=`<a class="result-link" href="${esc(s.url)}" target="_blank">🔗 Kaynağa git</a>`;
+  html+='</div>';
+  return html;
 }
 
-function renderTable() {
-  const filtered = standards.map((s,i)=>({...s,_idx:i})).filter(s => {
-    if (activeFilter==='all') return true;
-    if (activeFilter==='update') return s.status==='update';
-    if (activeFilter==='current') return s.status==='current';
-    if (activeFilter==='pending') return s.status==='pending'||s.status==='opened';
+function renderTable(){
+  const filtered=standards.filter(s=>{
+    if(activeFilter==='all') return true;
+    if(activeFilter==='update') return s.status==='update';
+    if(activeFilter==='current') return s.status==='current';
+    if(activeFilter==='history') return s.history&&s.history.length>1;
+    if(activeFilter==='pending') return s.status==='pending'||s.status==='checking';
     return true;
   });
-
-  const body = document.getElementById('tableBody');
-  if (!filtered.length) { body.innerHTML=`<tr><td colspan="4" style="text-align:center;padding:40px;color:#aaa">Bu filtrede sonuç yok</td></tr>`; return; }
-
-  body.innerHTML = filtered.map(s => {
-    const badge = {
-      pending: '<span class="badge badge-pending">⏳ Bekliyor</span>',
-      opened:  '<span class="badge badge-opened">👁 Açıldı — işaretleyin</span>',
-      current: '<span class="badge badge-current">✅ Güncel</span>',
-      update:  '<span class="badge badge-update">⚠️ Güncelleme Var</span>',
-    }[s.status] || '<span class="badge badge-pending">⏳ Bekliyor</span>';
-
-    const links = buildLinks(s).map(l =>
-      `<a class="search-link" href="${l.url}" target="_blank" onclick="markOpened(${s._idx})">${l.label}</a>`
-    ).join('');
-
-    const markBtns = (s.status==='pending'||s.status==='opened')
-      ? `<div class="mark-btns">
-           <button class="mark-btn green" onclick="mark(${s._idx},'current')">✅ Güncel</button>
-           <button class="mark-btn red" onclick="mark(${s._idx},'update')">⚠️ Güncelleme Var</button>
-         </div>`
-      : `<div class="mark-btns"><button class="mark-btn reset" onclick="mark(${s._idx},'pending')">↩ Sıfırla</button></div>`;
-
-    const rowClass = s.status==='update'?'row-update':s.status==='current'?'row-current':'';
-
-    return `<tr class="${rowClass}">
+  const body=document.getElementById('tableBody');
+  if(!filtered.length){body.innerHTML=`<tr><td colspan="4" style="text-align:center;padding:40px;color:#aaa">Bu filtrede sonuç yok</td></tr>`;return;}
+  body.innerHTML=filtered.map(s=>{
+    const rc=s.status==='update'?'row-update':s.status==='current'?'row-current':'';
+    return `<tr class="${rc}">
       <td><div class="std-code">${esc(s.no)}</div></td>
       <td><div class="std-name">${esc(s.name)}</div></td>
       <td style="font-size:12px;color:#888">${esc(s.tarih)}</td>
-      <td>
-        ${badge}
-        <div class="search-links">${links}</div>
-        ${markBtns}
-      </td>
+      <td>${buildResultHtml(s)}</td>
     </tr>`;
   }).join('');
 }
 
-function markOpened(idx) {
-  if (standards[idx].status === 'pending') {
-    standards[idx].status = 'opened';
-    renderTable(); updateStats();
+function updateStats(){
+  document.getElementById('statTotal').textContent=standards.length;
+  document.getElementById('statUpdate').textContent=standards.filter(s=>s.status==='update').length;
+  document.getElementById('statCurrent').textContent=standards.filter(s=>s.status==='current').length;
+  document.getElementById('statHistory').textContent=standards.filter(s=>s.history&&s.history.length>1).length;
+  document.getElementById('statPending').textContent=standards.filter(s=>s.status==='pending'||s.status==='checking').length;
+}
+
+async function startCheck(){
+  if(running) return;
+  running=true; shouldStop=false;
+  document.getElementById('startBtn').disabled=true;
+  document.getElementById('stopBtn').disabled=false;
+  document.getElementById('progressWrap').style.display='block';
+  document.getElementById('progressLabel').style.display='block';
+
+  const pending=standards.map((s,i)=>({...s,_idx:i})).filter(s=>s.status==='pending');
+  let done=0;
+
+  for(const s of pending){
+    if(shouldStop){log(`<span class="warn">⏹ Durduruldu (${done}/${pending.length})</span>`);break;}
+    standards[s._idx].status='checking';
+    renderTable();updateStats();
+    updateProgress(done,pending.length,s.no);
+
+    try{
+      const res=await fetch('/check_one',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({session_id:sessionId,idx:s._idx})
+      });
+      const data=await res.json();
+      if(data.error) throw new Error(data.error);
+      standards[s._idx]={...standards[s._idx],...data.standard};
+      const icon=standards[s._idx].status==='current'?'✅':standards[s._idx].status==='update'?'⚠️':'❓';
+      log(`${icon} ${s.no}${standards[s._idx].currentVer?' → '+standards[s._idx].currentVer:''}`);
+    } catch(err){
+      standards[s._idx].status='unknown';
+      standards[s._idx].note='Hata: '+err.message;
+      log(`<span class="err">✗</span> ${s.no} — ${err.message}`);
+    }
+
+    done++;
+    updateProgress(done,pending.length,'');
+    renderTable();updateStats();
+    if(done<pending.length&&!shouldStop) await sleep(1200);
   }
+
+  running=false;
+  document.getElementById('startBtn').disabled=false;
+  document.getElementById('stopBtn').disabled=true;
+  document.getElementById('exportBtn').disabled=false;
+  document.getElementById('progressLabel').style.display='none';
+  document.getElementById('progressWrap').style.display='none';
+  const upd=standards.filter(s=>s.status==='update').length;
+  const cur=standards.filter(s=>s.status==='current').length;
+  log(`<span class="ok">✓ Tamamlandı</span> — ${upd} güncelleme var · ${cur} güncel`);
+  toast(`Kontrol tamamlandı: ${upd} güncelleme, ${cur} güncel`);
 }
 
-async function mark(idx, status) {
-  standards[idx].status = status;
-  await fetch('/update', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ session_id: sessionId, idx, status, note: standards[idx].note || '' })
-  });
-  renderTable(); updateStats(); updateProgress();
-  const done = standards.filter(s => s.status==='current'||s.status==='update').length;
-  if (done === standards.length) {
-    document.getElementById('exportBtn').disabled = false;
-    toast('🎉 Tüm standartlar kontrol edildi! Excel\'e aktarabilirsiniz.');
-  }
+function stopCheck(){shouldStop=true;document.getElementById('stopBtn').disabled=true;}
+
+function updateProgress(done,total,current){
+  const pct=total>0?Math.round((done/total)*100):0;
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=current
+    ?`Kontrol ediliyor: ${current} (${done}/${total})`
+    :`Tamamlandı: ${done}/${total}`;
 }
 
-function openBatch() {
-  const pending = standards.map((s,i)=>({...s,_idx:i})).filter(s=>s.status==='pending').slice(0,10);
-  if (!pending.length) { toast('Tüm standartlar kontrol edildi!'); return; }
-  // Hepsini "opened" yap
-  pending.forEach(s => { standards[s._idx].status = 'opened'; });
-  renderTable(); updateStats();
-  // Sadece ilkini aç - kullanıcı sırayla arama linklerine tıklar
-  toast(`${pending.length} standart işaretlendi — her satırdaki 🔍 linklerine tıklayın`);
+async function exportExcel(){
+  const res=await fetch('/export',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sessionId})});
+  if(!res.ok){alert('Export hatası');return;}
+  const blob=await res.blob();
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url;
+  a.download=`standart_kontrol_${new Date().toISOString().slice(0,10)}.xlsx`;
+  a.click(); toast('⬇️ Excel indirildi');
 }
 
-function updateStats() {
-  document.getElementById('statTotal').textContent   = standards.length;
-  document.getElementById('statUpdate').textContent  = standards.filter(s=>s.status==='update').length;
-  document.getElementById('statCurrent').textContent = standards.filter(s=>s.status==='current').length;
-  document.getElementById('statPending').textContent = standards.filter(s=>s.status==='pending'||s.status==='opened').length;
-}
-
-function updateProgress() {
-  const done = standards.filter(s=>s.status==='current'||s.status==='update').length;
-  const total = standards.length;
-  if (!total) return;
-  const pct = Math.round((done/total)*100);
-  document.getElementById('progressWrap').style.display = 'block';
-  document.getElementById('progressLabel').style.display = 'block';
-  document.getElementById('progressBar').style.width = pct+'%';
-  document.getElementById('progressLabel').textContent = `İlerleme: ${done}/${total} standart kontrol edildi (${pct}%)`;
-}
-
-async function exportExcel() {
-  const res = await fetch('/export', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ session_id: sessionId })
-  });
-  if (!res.ok) { alert('Export hatası'); return; }
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `standart_kontrol_${new Date().toISOString().slice(0,10)}.xlsx`;
-  a.click();
-  toast('⬇️ Excel indirildi');
-}
-
-function setFilter(f, btn) {
-  activeFilter = f;
+function setFilter(f,btn){
+  activeFilter=f;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderTable();
+  btn.classList.add('active'); renderTable();
 }
 
-function resetAll() {
-  if (!confirm('Sıfırlanacak. Emin misiniz?')) return;
-  sessionId = null; standards = [];
-  ['statsRow','controlsRow','tableWrap','progressWrap','progressLabel'].forEach(id=>{
+function resetAll(){
+  if(!confirm('Sıfırlanacak. Emin misiniz?')) return;
+  sessionId=null; standards=[];
+  ['statsRow','controlsRow','tableWrap','logBox','progressWrap','progressLabel'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
+  document.getElementById('logBox').innerHTML='';
   document.getElementById('emptyMsg').style.display='block';
   const ua=document.getElementById('uploadArea');
   ua.classList.remove('loaded');
@@ -376,12 +327,10 @@ function resetAll() {
   ua.onclick=()=>document.getElementById('fileInput').click();
 }
 
-function toast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.style.display='block';
-  setTimeout(()=>t.style.display='none', 3000);
-}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
+function log(msg){const box=document.getElementById('logBox');box.innerHTML+=`<div>[${new Date().toLocaleTimeString('tr')}] ${msg}</div>`;box.scrollTop=box.scrollHeight;}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 </script>
 </body>
 </html>
