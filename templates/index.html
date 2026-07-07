@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Standart Güncelleme Denetleyici</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a18; min-height: 100vh; }
+  .topbar { background: #1a1a18; color: #fff; padding: 14px 32px; display: flex; align-items: center; gap: 12px; }
+  .topbar-icon { width: 28px; height: 28px; background: #22c55e; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+  .topbar h1 { font-size: 15px; font-weight: 500; }
+  .topbar-badge { margin-left: auto; background: #22c55e22; border: 1px solid #22c55e55; color: #22c55e; font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+  .main { max-width: 1100px; margin: 0 auto; padding: 28px 24px; }
+
+  .info-bar { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #92400e; display: flex; gap: 10px; align-items: flex-start; line-height: 1.6; }
+
+  .upload-area { background: #fff; border: 2px dashed #ccc; border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
+  .upload-area:hover { border-color: #4a9eff; background: #f0f7ff; }
+  .upload-area.loaded { border-color: #22c55e; background: #f0fdf4; border-style: solid; cursor: default; }
+  .upload-area h2 { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+  .upload-area p { font-size: 13px; color: #666; }
+  .upload-icon { font-size: 36px; margin-bottom: 10px; }
+  #fileInput { display: none; }
+
+  .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
+  .stat { background: #fff; border-radius: 10px; padding: 12px 16px; border: 1px solid #e5e5e3; }
+  .stat-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+  .stat-value { font-size: 26px; font-weight: 600; }
+  .stat-value.red { color: #ef4444; }
+  .stat-value.green { color: #22c55e; }
+  .stat-value.amber { color: #f59e0b; }
+
+  .controls { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
+  button { padding: 8px 14px; border-radius: 8px; border: 1px solid #d1d1cf; background: #fff; font-size: 13px; cursor: pointer; font-family: inherit; color: #1a1a18; transition: all 0.15s; }
+  button:hover:not(:disabled) { background: #f5f5f3; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  button.primary { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+  button.primary:hover:not(:disabled) { background: #333; }
+  button.danger-btn { color: #ef4444; border-color: #fca5a5; }
+  button.danger-btn:hover:not(:disabled) { background: #fef2f2; }
+  .filter-btns { display: flex; gap: 5px; margin-left: auto; flex-wrap: wrap; }
+  .filter-btn { padding: 5px 11px; border-radius: 20px; font-size: 12px; border: 1px solid #e5e5e3; background: #fff; cursor: pointer; }
+  .filter-btn.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+
+  .progress-wrap { background: #e5e5e3; border-radius: 4px; height: 4px; margin-bottom: 6px; overflow: hidden; display: none; }
+  .progress-bar { height: 100%; background: #22c55e; border-radius: 4px; transition: width 0.3s; }
+  .progress-label { font-size: 12px; color: #666; margin-bottom: 12px; display: none; }
+
+  .table-wrap { background: #fff; border-radius: 12px; border: 1px solid #e5e5e3; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #f8f8f6; padding: 9px 14px; text-align: left; font-weight: 500; font-size: 11px; color: #666; border-bottom: 1px solid #e5e5e3; text-transform: uppercase; letter-spacing: .03em; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid #f0f0ee; vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #fafaf8; }
+  tbody tr.row-update { background: #fff8f8; }
+  tbody tr.row-current { background: #f8fff8; }
+
+  .std-code { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; font-weight: 600; }
+  .std-name { font-size: 12px; color: #666; margin-top: 3px; line-height: 1.4; }
+
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge-pending  { background: #f5f5f3; color: #888; border: 1px solid #e5e5e3; }
+  .badge-opened   { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+  .badge-current  { background: #f0fdf4; color: #22c55e; border: 1px solid #bbf7d0; }
+  .badge-update   { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; }
+
+  .search-links { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
+  .search-link { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 6px; font-size: 11px; text-decoration: none; border: 1px solid #e5e5e3; color: #444; background: #f8f8f6; transition: all 0.15s; }
+  .search-link:hover { background: #eee; border-color: #ccc; }
+
+  .mark-btns { display: flex; gap: 5px; margin-top: 5px; align-items: center; }
+  .mark-btn { padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; border: 1px solid #e5e5e3; background: #fff; font-family: inherit; transition: all 0.15s; }
+  .mark-btn.green:hover { background: #f0fdf4; border-color: #bbf7d0; color: #16a34a; }
+  .mark-btn.red:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+  .mark-btn.reset { font-size: 10px; color: #aaa; }
+
+  .note-input { border: 1px solid #e5e5e3; border-radius: 6px; padding: 4px 8px; font-size: 12px; font-family: inherit; color: #555; width: 220px; margin-top: 5px; }
+  .note-input:focus { outline: none; border-color: #4a9eff; }
+
+  .empty { text-align: center; padding: 60px 20px; color: #aaa; }
+  .empty-icon { font-size: 44px; margin-bottom: 10px; }
+  .empty h3 { font-size: 15px; color: #888; margin-bottom: 5px; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a18; color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; display: none; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+  @media (max-width:700px) {
+    .stats { grid-template-columns: repeat(2,1fr); }
+    .controls { flex-direction: column; align-items: stretch; }
+    .filter-btns { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-icon">📋</div>
+  <h1>Standart Güncelleme Denetleyici</h1>
+  <span class="topbar-badge">✓ Ücretsiz</span>
+</div>
+
+<div class="main">
+
+  <div class="info-bar">
+    <span style="font-size:18px">💡</span>
+    <div>
+      <strong>Nasıl çalışır?</strong> Excel'inizi yükleyin → her standart için arama linklerine tıklayın → sonucu <b>Güncel</b> veya <b>Güncelleme Var</b> olarak işaretleyin → Excel'e aktarın. Tamamen ücretsiz.
+    </div>
+  </div>
+
+  <!-- Upload -->
+  <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+    <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="uploadFile(event)">
+    <div class="upload-icon">📂</div>
+    <h2>Excel dosyanızı buraya tıklayın veya sürükleyin</h2>
+    <p>Standart NO sütunu otomatik algılanır · .xlsx ve .xls desteklenir</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats" id="statsRow" style="display:none">
+    <div class="stat"><div class="stat-label">Toplam</div><div class="stat-value" id="statTotal">0</div></div>
+    <div class="stat"><div class="stat-label">Güncelleme Var</div><div class="stat-value red" id="statUpdate">0</div></div>
+    <div class="stat"><div class="stat-label">Güncel</div><div class="stat-value green" id="statCurrent">0</div></div>
+    <div class="stat"><div class="stat-label">Bekleyen</div><div class="stat-value amber" id="statPending">0</div></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls" id="controlsRow" style="display:none">
+    <button class="primary" onclick="openBatch()">🔗 Sonraki 10 Standardı Aç</button>
+    <button id="exportBtn" onclick="exportExcel()" disabled>⬇️ Excel'e Aktar</button>
+    <button class="danger-btn" onclick="resetAll()">🗑 Sıfırla</button>
+    <div class="filter-btns">
+      <button class="filter-btn active" onclick="setFilter('all',this)">Tümü</button>
+      <button class="filter-btn" onclick="setFilter('update',this)">Güncelleme Var</button>
+      <button class="filter-btn" onclick="setFilter('current',this)">Güncel</button>
+      <button class="filter-btn" onclick="setFilter('pending',this)">Bekleyen</button>
+    </div>
+  </div>
+
+  <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+  <div class="progress-label" id="progressLabel"></div>
+
+  <!-- Table -->
+  <div class="table-wrap" id="tableWrap" style="display:none">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:20%">Standart No</th>
+          <th style="width:25%">Standart Adı</th>
+          <th style="width:11%">Listedeki Tarih</th>
+          <th style="width:44%">Arama & Durum</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="empty" id="emptyMsg">
+    <div class="empty-icon">🗂️</div>
+    <h3>Henüz dosya yüklenmedi</h3>
+    <p>Excel dosyanızı yükleyerek başlayın</p>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let sessionId = null;
+let standards = [];
+let activeFilter = 'all';
+
+// Drag & drop
+const ua = document.getElementById('uploadArea');
+ua.addEventListener('dragover', e => { e.preventDefault(); ua.style.borderColor='#4a9eff'; });
+ua.addEventListener('dragleave', () => ua.style.borderColor='');
+ua.addEventListener('drop', e => {
+  e.preventDefault(); ua.style.borderColor='';
+  const file = e.dataTransfer.files[0];
+  if (file) doUpload(file);
+});
+
+function uploadFile(e) { doUpload(e.target.files[0]); }
+
+async function doUpload(file) {
+  const fd = new FormData();
+  fd.append('file', file);
+  try {
+    const res = await fetch('/upload', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (data.error) { alert('Hata: ' + data.error); return; }
+    sessionId = data.session_id;
+    standards = data.standards;
+    ua.classList.add('loaded');
+    ua.innerHTML = `<div class="upload-icon">✅</div><h2>${file.name}</h2><p>${standards.length} standart yüklendi</p>`;
+    show();
+    toast(`✓ ${standards.length} standart yüklendi`);
+  } catch(e) { alert('Yükleme hatası: ' + e.message); }
+}
+
+function show() {
+  document.getElementById('statsRow').style.display = 'grid';
+  document.getElementById('controlsRow').style.display = 'flex';
+  document.getElementById('tableWrap').style.display = 'block';
+  document.getElementById('emptyMsg').style.display = 'none';
+  renderTable(); updateStats(); updateProgress();
+}
+
+function buildLinks(s) {
+  const y = new Date().getFullYear();
+  const links = [];
+  const up = s.no.toUpperCase();
+  if (up.startsWith('TS')) {
+    links.push({ label: '🔍 TSE', url: `https://intweb.tse.org.tr/Standard/Standard/StandardAra.aspx?sira=1&durum=1&q=${encodeURIComponent(s.no)}` });
+  }
+  if (up.includes('ISO')) {
+    links.push({ label: '🔍 ISO', url: `https://www.iso.org/search.html#q=${encodeURIComponent(s.no.replace(/^TS EN |^TS |^EN /i,''))}&sort=rel&p=1` });
+  }
+  if (up.includes('IEC')) {
+    links.push({ label: '🔍 IEC', url: `https://www.iec.ch/searchpub/cur_fut_pa.htm?searchfor=${encodeURIComponent(s.no)}&search_type=ref_no` });
+  }
+  links.push({ label: '🔍 Google', url: `https://www.google.com/search?q=${encodeURIComponent(s.no + ' latest version ' + y)}` });
+  return links;
+}
+
+function renderTable() {
+  const filtered = standards.map((s,i)=>({...s,_idx:i})).filter(s => {
+    if (activeFilter==='all') return true;
+    if (activeFilter==='update') return s.status==='update';
+    if (activeFilter==='current') return s.status==='current';
+    if (activeFilter==='pending') return s.status==='pending'||s.status==='opened';
+    return true;
+  });
+
+  const body = document.getElementById('tableBody');
+  if (!filtered.length) { body.innerHTML=`<tr><td colspan="4" style="text-align:center;padding:40px;color:#aaa">Bu filtrede sonuç yok</td></tr>`; return; }
+
+  body.innerHTML = filtered.map(s => {
+    const badge = {
+      pending: '<span class="badge badge-pending">⏳ Bekliyor</span>',
+      opened:  '<span class="badge badge-opened">👁 Açıldı — işaretleyin</span>',
+      current: '<span class="badge badge-current">✅ Güncel</span>',
+      update:  '<span class="badge badge-update">⚠️ Güncelleme Var</span>',
+    }[s.status] || '<span class="badge badge-pending">⏳ Bekliyor</span>';
+
+    const links = buildLinks(s).map(l =>
+      `<a class="search-link" href="${l.url}" target="_blank" onclick="markOpened(${s._idx})">${l.label}</a>`
+    ).join('');
+
+    const markBtns = (s.status==='pending'||s.status==='opened')
+      ? `<div class="mark-btns">
+           <button class="mark-btn green" onclick="mark(${s._idx},'current')">✅ Güncel</button>
+           <button class="mark-btn red" onclick="mark(${s._idx},'update')">⚠️ Güncelleme Var</button>
+         </div>`
+      : `<div class="mark-btns"><button class="mark-btn reset" onclick="mark(${s._idx},'pending')">↩ Sıfırla</button></div>`;
+
+    const rowClass = s.status==='update'?'row-update':s.status==='current'?'row-current':'';
+
+    return `<tr class="${rowClass}">
+      <td><div class="std-code">${esc(s.no)}</div></td>
+      <td><div class="std-name">${esc(s.name)}</div></td>
+      <td style="font-size:12px;color:#888">${esc(s.tarih)}</td>
+      <td>
+        ${badge}
+        <div class="search-links">${links}</div>
+        ${markBtns}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function markOpened(idx) {
+  if (standards[idx].status === 'pending') {
+    standards[idx].status = 'opened';
+    renderTable(); updateStats();
+  }
+}
+
+async function mark(idx, status) {
+  standards[idx].status = status;
+  await fetch('/update', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ session_id: sessionId, idx, status, note: standards[idx].note || '' })
+  });
+  renderTable(); updateStats(); updateProgress();
+  const done = standards.filter(s => s.status==='current'||s.status==='update').length;
+  if (done === standards.length) {
+    document.getElementById('exportBtn').disabled = false;
+    toast('🎉 Tüm standartlar kontrol edildi! Excel\'e aktarabilirsiniz.');
+  }
+}
+
+function openBatch() {
+  const pending = standards.map((s,i)=>({...s,_idx:i})).filter(s=>s.status==='pending').slice(0,10);
+  if (!pending.length) { toast('Tüm standartlar kontrol edildi!'); return; }
+  pending.forEach(s => {
+    standards[s._idx].status = 'opened';
+    const url = `https://www.google.com/search?q=${encodeURIComponent(s.no+' latest version '+new Date().getFullYear())}`;
+    window.open(url, '_blank');
+  });
+  renderTable(); updateStats();
+  toast(`${pending.length} standart için arama açıldı`);
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent   = standards.length;
+  document.getElementById('statUpdate').textContent  = standards.filter(s=>s.status==='update').length;
+  document.getElementById('statCurrent').textContent = standards.filter(s=>s.status==='current').length;
+  document.getElementById('statPending').textContent = standards.filter(s=>s.status==='pending'||s.status==='opened').length;
+}
+
+function updateProgress() {
+  const done = standards.filter(s=>s.status==='current'||s.status==='update').length;
+  const total = standards.length;
+  if (!total) return;
+  const pct = Math.round((done/total)*100);
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('progressLabel').style.display = 'block';
+  document.getElementById('progressBar').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = `İlerleme: ${done}/${total} standart kontrol edildi (${pct}%)`;
+}
+
+async function exportExcel() {
+  const res = await fetch('/export', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ session_id: sessionId })
+  });
+  if (!res.ok) { alert('Export hatası'); return; }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `standart_kontrol_${new Date().toISOString().slice(0,10)}.xlsx`;
+  a.click();
+  toast('⬇️ Excel indirildi');
+}
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+function resetAll() {
+  if (!confirm('Sıfırlanacak. Emin misiniz?')) return;
+  sessionId = null; standards = [];
+  ['statsRow','controlsRow','tableWrap','progressWrap','progressLabel'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.style.display='none';
+  });
+  document.getElementById('emptyMsg').style.display='block';
+  const ua=document.getElementById('uploadArea');
+  ua.classList.remove('loaded');
+  ua.innerHTML=`<input type="file" id="fileInput" accept=".xlsx,.xls" onchange="uploadFile(event)" style="display:none"><div class="upload-icon">📂</div><h2>Excel dosyanızı buraya tıklayın veya sürükleyin</h2><p>Standart NO sütunu otomatik algılanır · .xlsx ve .xls desteklenir</p>`;
+  ua.onclick=()=>document.getElementById('fileInput').click();
+}
+
+function toast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none', 3000);
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>

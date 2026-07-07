@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: standart-kontrol
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
