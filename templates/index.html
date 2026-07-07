@@ -126,7 +126,7 @@
 
   <!-- Controls -->
   <div class="controls" id="controlsRow" style="display:none">
-    <button class="primary" onclick="openBatch()">🔗 Sonraki 10 Standardı Aç</button>
+    <button class="primary" onclick="openBatch()">📋 Sonraki 10 Standardı İşaretle</button>
     <button id="exportBtn" onclick="exportExcel()" disabled>⬇️ Excel'e Aktar</button>
     <button class="danger-btn" onclick="resetAll()">🗑 Sıfırla</button>
     <div class="filter-btns">
@@ -207,19 +207,40 @@ function show() {
 }
 
 function buildLinks(s) {
-  const y = new Date().getFullYear();
   const links = [];
   const up = s.no.toUpperCase();
-  if (up.startsWith('TS')) {
-    links.push({ label: '🔍 TSE', url: `https://intweb.tse.org.tr/Standard/Standard/StandardAra.aspx?sira=1&durum=1&q=${encodeURIComponent(s.no)}` });
+  const cleanNo = s.no.replace(/^TSE?\s+(CEN\s+)?|^TS\s+(EN\s+)?(ISO\s+|IEC\s+)?|^EN\s+(ISO\s+|IEC\s+)?/i, '').trim();
+
+  if (up.startsWith('TS') || up.startsWith('TSE')) {
+    links.push({ label: '\uD83D\uDD0D TSE', url: 'https://intweb.tse.org.tr/Standard/Standard/StandardAra.aspx?sira=1&durum=1&q=' + encodeURIComponent(s.no) });
   }
   if (up.includes('ISO')) {
-    links.push({ label: '🔍 ISO', url: `https://www.iso.org/search.html#q=${encodeURIComponent(s.no.replace(/^TS EN |^TS |^EN /i,''))}&sort=rel&p=1` });
+    links.push({ label: '\uD83D\uDD0D ISO', url: 'https://www.iso.org/search.html#q=' + encodeURIComponent(cleanNo) + '&sort=rel&p=1' });
   }
   if (up.includes('IEC')) {
-    links.push({ label: '🔍 IEC', url: `https://www.iec.ch/searchpub/cur_fut_pa.htm?searchfor=${encodeURIComponent(s.no)}&search_type=ref_no` });
+    links.push({ label: '\uD83D\uDD0D IEC', url: 'https://www.iec.ch/searchpub/cur_fut_pa.htm?searchfor=' + encodeURIComponent(cleanNo) + '&search_type=ref_no' });
   }
-  links.push({ label: '🔍 Google', url: `https://www.google.com/search?q=${encodeURIComponent(s.no + ' latest version ' + y)}` });
+  if (up.startsWith('EN ') && !up.includes('ISO') && !up.includes('IEC')) {
+    links.push({ label: '\uD83D\uDD0D EUR-Lex', url: 'https://eur-lex.europa.eu/search.html?text=' + encodeURIComponent(s.no) + '&scope=EURLEX&type=quick' });
+  }
+  if (up.includes('MDCG')) {
+    links.push({ label: '\uD83D\uDD0D MDCG', url: 'https://ec.europa.eu/health/md_sector/new_regulations/guidance_en' });
+  }
+  if (up.includes('IMDRF') || up.includes('GHTF')) {
+    links.push({ label: '\uD83D\uDD0D IMDRF', url: 'https://www.imdrf.org/documents/library' });
+  }
+  if (up.includes('IAF')) {
+    links.push({ label: '\uD83D\uDD0D IAF', url: 'https://www.iaf.nu/articles/Publications/6' });
+  }
+  if (up.startsWith('EA ') || up.startsWith('EA-')) {
+    links.push({ label: '\uD83D\uDD0D EA', url: 'https://european-accreditation.org/publications-and-news/ea-publications/' });
+  }
+  if (up.includes('ILAC')) {
+    links.push({ label: '\uD83D\uDD0D ILAC', url: 'https://ilac.org/publications-and-resources/' });
+  }
+  if (links.length === 0) {
+    links.push({ label: '\uD83D\uDD0D TSE', url: 'https://intweb.tse.org.tr/Standard/Standard/StandardAra.aspx?sira=1&durum=1&q=' + encodeURIComponent(s.no) });
+  }
   return links;
 }
 
@@ -294,13 +315,11 @@ async function mark(idx, status) {
 function openBatch() {
   const pending = standards.map((s,i)=>({...s,_idx:i})).filter(s=>s.status==='pending').slice(0,10);
   if (!pending.length) { toast('Tüm standartlar kontrol edildi!'); return; }
-  pending.forEach(s => {
-    standards[s._idx].status = 'opened';
-    const url = `https://www.google.com/search?q=${encodeURIComponent(s.no+' latest version '+new Date().getFullYear())}`;
-    window.open(url, '_blank');
-  });
+  // Hepsini "opened" yap
+  pending.forEach(s => { standards[s._idx].status = 'opened'; });
   renderTable(); updateStats();
-  toast(`${pending.length} standart için arama açıldı`);
+  // Sadece ilkini aç - kullanıcı sırayla arama linklerine tıklar
+  toast(`${pending.length} standart işaretlendi — her satırdaki 🔍 linklerine tıklayın`);
 }
 
 function updateStats() {
