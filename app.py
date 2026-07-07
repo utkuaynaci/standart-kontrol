@@ -9,7 +9,7 @@ from datetime import datetime
 app = Flask(__name__)
 standards_store = {}
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
 def parse_excel(file):
     df = pd.read_excel(file, header=None)
@@ -124,16 +124,17 @@ SADECE JSON formatında yanıt ver, başka hiçbir şey yazma:
 
     try:
         res = requests.post(
-            'https://api.openai.com/v1/chat/completions',
+            'https://api.anthropic.com/v1/messages',
             headers={
                 'Content-Type': 'application/json',
-                'Authorization': f'Bearer {OPENAI_API_KEY}'
+                'x-api-key': ANTHROPIC_API_KEY,
+                'anthropic-version': '2023-06-01'
             },
             json={
-                'model': 'gpt-4o-mini',
-                'messages': [{'role': 'user', 'content': prompt}],
-                'temperature': 0.1,
-                'max_tokens': 800
+                'model': 'claude-haiku-4-5',
+                'max_tokens': 800,
+                'tools': [{'type': 'web_search_20250305', 'name': 'web_search'}],
+                'messages': [{'role': 'user', 'content': prompt}]
             },
             timeout=30
         )
@@ -143,7 +144,7 @@ SADECE JSON formatında yanıt ver, başka hiçbir şey yazma:
             return jsonify({'error': str(err)}), 400
 
         result = res.json()
-        text = result['choices'][0]['message']['content']
+        text = ''.join(b['text'] for b in result['content'] if b['type'] == 'text')
 
         clean = text.replace('```json', '').replace('```', '').strip()
 
