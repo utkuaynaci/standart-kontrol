@@ -9,7 +9,7 @@ from datetime import datetime
 app = Flask(__name__)
 standards_store = {}
 
-ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
 
 def parse_excel(file):
     df = pd.read_excel(file, header=None)
@@ -44,7 +44,11 @@ def parse_excel(file):
             tarih = ''
         if '00:00:00' in tarih:
             tarih = tarih.replace(' 00:00:00', '').strip()
-        records.append({'no': no, 'name': name if name != 'nan' else '', 'tarih': tarih, 'status': 'pending', 'note': '', 'currentVer': '', 'history': []})
+        records.append({
+            'no': no, 'name': name if name != 'nan' else '',
+            'tarih': tarih, 'status': 'pending',
+            'note': '', 'currentVer': '', 'history': [], 'url': ''
+        })
     return records
 
 @app.route('/')
@@ -71,10 +75,10 @@ def check_one():
     idx = data.get('idx')
     if session_id not in standards_store:
         return jsonify({'error': 'Oturum bulunamadı'}), 404
-    s = standards_store[session_id][idx]
 
-    # Kaynağı belirle
+    s = standards_store[session_id][idx]
     up = s['no'].upper()
+
     if 'ISO' in up:
         src = 'ISO (iso.org)'
     elif 'IEC' in up:
@@ -94,18 +98,18 @@ def check_one():
     else:
         src = 'TSE (tse.org.tr)'
 
-    prompt = f"""Sen bir standartlar uzmanısın. Aşağıdaki standart için güncellik kontrolü yap.
+    prompt = f"""Sen bir standartlar uzmanısın. Aşağıdaki standart için web'de arama yaparak güncellik kontrolü yap.
 
 Standart kodu: "{s['no']}"
 Standart adı: "{s['name']}"
 Bizim listedeki tarih/versiyon: "{s['tarih'] or 'belirtilmemiş'}"
 Resmi kaynak: {src}
 
-ÖNEMLİ: Eğer bu standart iptal edilerek yeni bir kodla değiştirildiyse bunu belirt.
+ÖNEMLİ: Eğer bu standart iptal edilerek yeni bir kodla değiştirildiyse bunu da belirt.
 
 Görevler:
 1. Bu standartın TÜM versiyon geçmişini bul
-2. En güncel versiyonu belirle
+2. En güncel versiyonu belirle  
 3. Bizim tarihimizden sonra yeni versiyon var mı?
 
 SADECE JSON formatında yanıt ver, başka hiçbir şey yazma:
@@ -120,26 +124,26 @@ SADECE JSON formatında yanıt ver, başka hiçbir şey yazma:
 
     try:
         res = requests.post(
-            'https://api.anthropic.com/v1/messages',
-            headers={
-                'Content-Type': 'application/json',
-                'x-api-key': ANTHROPIC_API_KEY,
-                'anthropic-version': '2023-06-01'
-            },
+            f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}',
+            headers={'Content-Type': 'application/json'},
             json={
-                'model': 'claude-sonnet-4-6',
-                'max_tokens': 600,
-                'tools': [{'type': 'web_search_20250305', 'name': 'web_search'}],
-                'messages': [{'role': 'user', 'content': prompt}]
+                'contents': [{'parts': [{'text': prompt}]}],
+                'tools': [{'google_search': {}}],
+                'generationConfig': {'temperature': 0.1, 'maxOutputTokens': 800}
             },
             timeout=30
         )
+
         if not res.ok:
             err = res.json()
-            return jsonify({'error': err.get('error', {}).get('message', f'HTTP {res.status_code}')}), 400
+            return jsonify({'error': str(err)}), 400
 
         result = res.json()
-        text = ''.join(b['text'] for b in result['content'] if b['type'] == 'text')
+        text = ''
+        for part in result.get('candidates', [{}])[0].get('content', {}).get('parts', []):
+            if 'text' in part:
+                text += part['text']
+
         clean = text.replace('```json', '').replace('```', '').strip()
 
         try:
@@ -203,7 +207,7 @@ def export():
     rows = [['Standart No', 'Standart Adı', 'Listedeki Tarih', 'Durum', 'Güncel Versiyon', 'Açıklama', 'Versiyon Geçmişi']]
     for s in records:
         durum = {'current': 'Güncel', 'update': 'Güncelleme Var', 'unknown': 'Bulunamadı', 'pending': 'Kontrol Edilmedi'}.get(s['status'], '')
-        his = ' → '.join(h['year'] + (' (' + h['not'] + ')' if h.get('not') else '') for h in s.get('history', []))
+        his = ' → '.join(h['year'] + (' (' + h.get('not', '') + ')' if h.get('not') else '') for h in s.get('history', []))
         rows.append([s['no'], s['name'], s['tarih'], durum, s.get('currentVer', ''), s.get('note', ''), his])
     df = pd.DataFrame(rows[1:], columns=rows[0])
     output = io.BytesIO()
