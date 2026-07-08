@@ -1,25 +1,61 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Giriş — Standart Denetleyici</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-  .card { background: #fff; border-radius: 14px; border: 1px solid #e5e5e3; padding: 40px; width: 360px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
-  .logo { width: 40px; height: 40px; background: #1a1a18; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 20px; }
-  h1 { font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 6px; color: #1a1a18; }
-  p { font-size: 13px; color: #888; text-align: center; margin-bottom: 28px; }
-  label { display: block; font-size: 12px; font-weight: 500; color: #555; margin-bottom: 5px; }
-  input { width: 100%; padding: 10px 12px; border: 1px solid #d1d1cf; border-radius: 8px; font-size: 14px; font-family: inherit; color: #1a1a18; margin-bottom: 14px; transition: border 0.15s; }
-  input:focus { outline: none; border-color: #1a1a18; }
-  button { width: 100%; padding: 11px; background: #1a1a18; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-family: inherit; cursor: pointer; font-weight: 500; margin-top: 4px; transition: background 0.15s; }
-  button:hover { background: #333; }
-  .error { background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; padding: 10px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; text-align: center; }
+  :root[data-theme="dark"] {
+    --bg: #0f0f0f;
+    --card-bg: #1a1a1a;
+    --border: #2a2a2a;
+    --text: #e5e5e3;
+    --text-muted: #666;
+    --input-bg: #0f0f0f;
+    --input-border: #2a2a2a;
+    --btn-bg: #3b82f6;
+    --error-bg: #1f0f0f;
+    --error-border: #3f1f1f;
+    --error-text: #ef4444;
+    --toggle-bg: #2a2a2a;
+    --toggle-text: #888;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f5f3;
+    --card-bg: #fff;
+    --border: #e5e5e3;
+    --text: #1a1a18;
+    --text-muted: #888;
+    --input-bg: #fff;
+    --input-border: #d1d1cf;
+    --btn-bg: #1a1a18;
+    --error-bg: #fef2f2;
+    --error-border: #fca5a5;
+    --error-text: #dc2626;
+    --toggle-bg: #f0f0ee;
+    --toggle-text: #666;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.2s, color 0.2s, border-color 0.2s; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .theme-toggle { position: fixed; top: 16px; right: 16px; }
+  .theme-btn { padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--toggle-bg); color: var(--toggle-text); font-size: 12px; cursor: pointer; font-family: inherit; }
+  .theme-btn:hover { color: var(--text); }
+  .card { background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border); padding: 40px; width: 360px; box-shadow: 0 4px 24px rgba(0,0,0,0.2); }
+  .logo { width: 40px; height: 40px; background: #3b82f6; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 20px; }
+  h1 { font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 6px; color: var(--text); }
+  p { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 28px; }
+  label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 5px; }
+  input { width: 100%; padding: 10px 12px; border: 1px solid var(--input-border); border-radius: 8px; font-size: 14px; font-family: inherit; color: var(--text); background: var(--input-bg); margin-bottom: 14px; }
+  input:focus { outline: none; border-color: #3b82f6; }
+  button[type=submit] { width: 100%; padding: 11px; background: var(--btn-bg); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-family: inherit; cursor: pointer; font-weight: 500; margin-top: 4px; }
+  button[type=submit]:hover { opacity: 0.9; }
+  .error { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); padding: 10px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; text-align: center; }
 </style>
 </head>
 <body>
+<div class="theme-toggle">
+  <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">☀️ Açık Mod</button>
+</div>
 <div class="card">
   <div class="logo">📋</div>
   <h1>Standart Denetleyici</h1>
@@ -35,5 +71,18 @@
     <button type="submit">Giriş Yap</button>
   </form>
 </div>
+<script>
+  const saved = localStorage.getItem('theme') || 'dark';
+  setTheme(saved);
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    document.getElementById('themeBtn').textContent = t === 'dark' ? '☀️ Açık Mod' : '🌙 Koyu Mod';
+  }
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  }
+</script>
 </body>
 </html>
