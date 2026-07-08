@@ -3,153 +3,176 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Standart Güncelleme Denetleyici</title>
+<title>Standart Denetleyici</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a18; min-height: 100vh; }
-  .topbar { background: #1a1a18; color: #fff; padding: 14px 32px; display: flex; align-items: center; gap: 12px; }
-  .topbar-icon { width: 28px; height: 28px; background: #4a9eff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
-  .topbar h1 { font-size: 15px; font-weight: 500; }
-  .topbar-badge { margin-left: auto; background: #4a9eff22; border: 1px solid #4a9eff55; color: #4a9eff; font-size: 11px; padding: 3px 10px; border-radius: 20px; }
-  .main { max-width: 1100px; margin: 0 auto; padding: 28px 24px; }
-  .upload-area { background: #fff; border: 2px dashed #ccc; border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
-  .upload-area:hover { border-color: #4a9eff; background: #f0f7ff; }
-  .upload-area.loaded { border-color: #22c55e; background: #f0fdf4; border-style: solid; cursor: default; }
-  .upload-area h2 { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
-  .upload-area p { font-size: 13px; color: #666; }
-  .upload-icon { font-size: 36px; margin-bottom: 10px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e3; min-height: 100vh; display: flex; flex-direction: column; }
+
+  .topbar { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 14px 32px; display: flex; align-items: center; gap: 12px; }
+  .topbar-icon { width: 28px; height: 28px; background: #3b82f6; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+  .topbar h1 { font-size: 15px; font-weight: 500; color: #e5e5e3; }
+  .logout-btn { margin-left: auto; padding: 5px 12px; border-radius: 6px; border: 1px solid #333; background: transparent; color: #888; font-size: 12px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .logout-btn:hover { border-color: #555; color: #ccc; }
+
+  .main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; }
+
+  .upload-area { border: 2px dashed #333; border-radius: 14px; padding: 48px 60px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 0; width: 100%; max-width: 540px; background: #1a1a1a; }
+  .upload-area:hover { border-color: #3b82f6; background: #1a1f2e; }
+  .upload-area.loaded { border-color: #22c55e; background: #0f1f14; border-style: solid; cursor: default; }
+  .upload-area h2 { font-size: 15px; font-weight: 400; color: #aaa; margin-bottom: 4px; }
+  .upload-area p { font-size: 12px; color: #555; }
   #fileInput { display: none; }
+
+  .content-area { width: 100%; max-width: 1100px; }
+
   .stats { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 16px; }
-  .stat { background: #fff; border-radius: 10px; padding: 12px 16px; border: 1px solid #e5e5e3; }
-  .stat-label { font-size: 11px; color: #888; margin-bottom: 4px; }
-  .stat-value { font-size: 24px; font-weight: 600; }
+  .stat { background: #1a1a1a; border-radius: 10px; padding: 12px 16px; border: 1px solid #2a2a2a; }
+  .stat-label { font-size: 11px; color: #555; margin-bottom: 4px; }
+  .stat-value { font-size: 24px; font-weight: 600; color: #e5e5e3; }
   .stat-value.red { color: #ef4444; }
   .stat-value.green { color: #22c55e; }
   .stat-value.amber { color: #f59e0b; }
   .stat-value.blue { color: #3b82f6; }
+
   .controls { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
-  button { padding: 8px 14px; border-radius: 8px; border: 1px solid #d1d1cf; background: #fff; font-size: 13px; cursor: pointer; font-family: inherit; color: #1a1a18; transition: all 0.15s; }
-  button:hover:not(:disabled) { background: #f5f5f3; }
-  button:disabled { opacity: 0.4; cursor: not-allowed; }
-  button.primary { background: #1a1a18; color: #fff; border-color: #1a1a18; }
-  button.primary:hover:not(:disabled) { background: #333; }
-  button.danger-btn { color: #ef4444; border-color: #fca5a5; }
-  button.danger-btn:hover:not(:disabled) { background: #fef2f2; }
+  button { padding: 8px 14px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; font-size: 13px; cursor: pointer; font-family: inherit; color: #e5e5e3; transition: all 0.15s; }
+  button:hover:not(:disabled) { background: #252525; border-color: #444; }
+  button:disabled { opacity: 0.3; cursor: not-allowed; }
+  button.primary { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+  button.primary:hover:not(:disabled) { background: #2563eb; border-color: #2563eb; }
+  button.danger-btn { color: #ef4444; border-color: #3f1f1f; }
+  button.danger-btn:hover:not(:disabled) { background: #1f0f0f; }
   .filter-btns { display: flex; gap: 5px; margin-left: auto; flex-wrap: wrap; }
-  .filter-btn { padding: 5px 11px; border-radius: 20px; font-size: 12px; border: 1px solid #e5e5e3; background: #fff; cursor: pointer; }
-  .filter-btn.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
-  .progress-wrap { background: #e5e5e3; border-radius: 4px; height: 4px; margin-bottom: 6px; overflow: hidden; display: none; }
-  .progress-bar { height: 100%; background: #4a9eff; border-radius: 4px; transition: width 0.3s; }
-  .progress-label { font-size: 12px; color: #666; margin-bottom: 12px; display: none; }
-  .table-wrap { background: #fff; border-radius: 12px; border: 1px solid #e5e5e3; overflow: hidden; }
+  .filter-btn { padding: 5px 11px; border-radius: 20px; font-size: 12px; border: 1px solid #2a2a2a; background: #1a1a1a; color: #888; cursor: pointer; }
+  .filter-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+
+  .progress-wrap { background: #2a2a2a; border-radius: 4px; height: 3px; margin-bottom: 6px; overflow: hidden; display: none; }
+  .progress-bar { height: 100%; background: #3b82f6; border-radius: 4px; transition: width 0.3s; }
+  .progress-label { font-size: 12px; color: #555; margin-bottom: 12px; display: none; }
+
+  .table-wrap { background: #1a1a1a; border-radius: 12px; border: 1px solid #2a2a2a; overflow: hidden; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead th { background: #f8f8f6; padding: 9px 14px; text-align: left; font-weight: 500; font-size: 11px; color: #666; border-bottom: 1px solid #e5e5e3; text-transform: uppercase; letter-spacing: .03em; }
-  tbody td { padding: 10px 14px; border-bottom: 1px solid #f0f0ee; vertical-align: top; }
+  thead th { background: #141414; padding: 9px 14px; text-align: left; font-weight: 500; font-size: 11px; color: #555; border-bottom: 1px solid #2a2a2a; text-transform: uppercase; letter-spacing: .03em; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid #222; vertical-align: top; }
   tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover { background: #fafaf8; }
-  tbody tr.row-update { background: #fff8f8; }
-  tbody tr.row-current { background: #f8fff8; }
-  .std-code { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; font-weight: 600; }
+  tbody tr:hover { background: #1f1f1f; }
+  tbody tr.row-update { background: #1f0f0f; }
+  tbody tr.row-current { background: #0f1a0f; }
+
+  .std-code { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; font-weight: 600; color: #e5e5e3; }
   .std-name { font-size: 12px; color: #666; margin-top: 3px; line-height: 1.4; }
+
   .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
-  .badge-pending  { background: #f5f5f3; color: #888; border: 1px solid #e5e5e3; }
-  .badge-checking { background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe; }
-  .badge-current  { background: #f0fdf4; color: #22c55e; border: 1px solid #bbf7d0; }
-  .badge-update   { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; }
-  .badge-unknown  { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+  .badge-pending  { background: #1f1f1f; color: #555; border: 1px solid #2a2a2a; }
+  .badge-checking { background: #1a1f2e; color: #3b82f6; border: 1px solid #1e3a5f; }
+  .badge-current  { background: #0f1a0f; color: #22c55e; border: 1px solid #1a3a1a; }
+  .badge-update   { background: #1f0f0f; color: #ef4444; border: 1px solid #3f1f1f; }
+  .badge-unknown  { background: #1f1a0f; color: #f59e0b; border: 1px solid #3f2f0f; }
+
   .result-box { margin-top: 5px; }
-  .result-ver { font-size: 12px; font-weight: 500; margin-bottom: 3px; }
-  .result-detail { font-size: 12px; color: #555; line-height: 1.5; margin-bottom: 4px; max-width: 400px; }
+  .result-ver { font-size: 12px; font-weight: 500; margin-bottom: 3px; color: #ccc; }
+  .result-detail { font-size: 12px; color: #666; line-height: 1.5; margin-bottom: 4px; max-width: 400px; }
   .history-wrap { margin-top: 5px; }
-  .history-title { font-size: 10px; font-weight: 500; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .03em; }
-  .history-timeline { display: flex; flex-wrap: wrap; align-items: center; gap: 0; }
+  .history-title { font-size: 10px; font-weight: 500; color: #555; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .03em; }
+  .history-timeline { display: flex; flex-wrap: wrap; align-items: center; }
   .history-ver { display: inline-flex; flex-direction: column; align-items: center; }
   .history-dot-wrap { display: flex; align-items: center; }
-  .history-dot { width: 8px; height: 8px; border-radius: 50%; background: #d1d5db; border: 2px solid #9ca3af; flex-shrink: 0; }
-  .history-dot.latest { background: #3b82f6; border-color: #1d4ed8; }
+  .history-dot { width: 8px; height: 8px; border-radius: 50%; background: #333; border: 2px solid #444; flex-shrink: 0; }
+  .history-dot.latest { background: #3b82f6; border-color: #2563eb; }
   .history-dot.ours   { background: #f59e0b; border-color: #d97706; }
-  .history-line { width: 16px; height: 2px; background: #e5e7eb; }
-  .history-label { font-size: 10px; color: #888; margin-top: 2px; white-space: nowrap; }
-  .history-label.bold { color: #1a1a18; font-weight: 600; }
-  .result-link { font-size: 12px; color: #4a9eff; text-decoration: none; display: inline-block; margin-top: 3px; }
+  .history-line { width: 16px; height: 2px; background: #2a2a2a; }
+  .history-label { font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap; }
+  .history-label.bold { color: #aaa; font-weight: 600; }
+  .result-link { font-size: 12px; color: #3b82f6; text-decoration: none; display: inline-block; margin-top: 3px; }
   .result-link:hover { text-decoration: underline; }
-  .empty { text-align: center; padding: 60px 20px; color: #aaa; }
-  .empty-icon { font-size: 44px; margin-bottom: 10px; }
-  .empty h3 { font-size: 15px; color: #888; margin-bottom: 5px; }
-  .log-box { background: #1a1a18; color: #aaa; font-family: monospace; font-size: 12px; padding: 12px 16px; border-radius: 8px; margin-top: 12px; max-height: 140px; overflow-y: auto; display: none; line-height: 1.9; }
+
+  .log-box { background: #0a0a0a; color: #555; font-family: monospace; font-size: 12px; padding: 12px 16px; border-radius: 8px; margin-top: 12px; max-height: 130px; overflow-y: auto; display: none; line-height: 1.9; border: 1px solid #1a1a1a; }
   .log-box .ok   { color: #22c55e; }
   .log-box .warn { color: #f59e0b; }
   .log-box .err  { color: #ef4444; }
-  .log-box .info { color: #60a5fa; }
-  .toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a18; color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; display: none; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+  .log-box .info { color: #3b82f6; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a1a; border: 1px solid #2a2a2a; color: #e5e5e3; padding: 12px 18px; border-radius: 10px; font-size: 13px; display: none; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+
   @media (max-width:700px) {
     .stats { grid-template-columns: repeat(2,1fr); }
     .controls { flex-direction: column; align-items: stretch; }
     .filter-btns { margin-left: 0; }
+    .upload-area { padding: 32px 24px; }
   }
 </style>
 </head>
 <body>
+
 <div class="topbar">
   <div class="topbar-icon">📋</div>
-  <h1>Standart Güncelleme Denetleyici</h1>
-  <span class="topbar-badge">⚡ Otomatik</span>
+  <h1>Standart Denetleyici</h1>
+  <button class="logout-btn" onclick="window.location='/logout'">Çıkış</button>
 </div>
-<div class="main">
+
+<div class="main" id="mainArea">
+
+  <!-- Upload -->
   <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
     <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="uploadFile(event)">
-    <div class="upload-icon">📂</div>
-    <h2>Excel dosyanızı buraya tıklayın veya sürükleyin</h2>
-    <p>Standart NO sütunu otomatik algılanır · .xlsx ve .xls desteklenir</p>
+    <h2>Excel dosyanızı buraya sürükleyin veya yüklemek için tıklayın</h2>
+    <p>.xlsx · .xls · Standart NO sütunu otomatik algılanır</p>
   </div>
-  <div class="stats" id="statsRow" style="display:none">
-    <div class="stat"><div class="stat-label">Toplam</div><div class="stat-value" id="statTotal">0</div></div>
-    <div class="stat"><div class="stat-label">Güncelleme Var</div><div class="stat-value red" id="statUpdate">0</div></div>
-    <div class="stat"><div class="stat-label">Güncel</div><div class="stat-value green" id="statCurrent">0</div></div>
-    <div class="stat"><div class="stat-label">Geçmiş Var</div><div class="stat-value blue" id="statHistory">0</div></div>
-    <div class="stat"><div class="stat-label">Bekleyen</div><div class="stat-value amber" id="statPending">0</div></div>
-  </div>
-  <div class="controls" id="controlsRow" style="display:none">
-    <button class="primary" id="startBtn" onclick="startCheck()">🔍 Tümünü Otomatik Kontrol Et</button>
-    <button id="stopBtn" onclick="stopCheck()" disabled>⏹ Durdur</button>
-    <button id="exportBtn" onclick="exportExcel()" disabled>⬇️ Excel'e Aktar</button>
-    <button class="danger-btn" onclick="resetAll()">🗑 Sıfırla</button>
-    <div class="filter-btns">
-      <button class="filter-btn active" onclick="setFilter('all',this)">Tümü</button>
-      <button class="filter-btn" onclick="setFilter('update',this)">Güncelleme Var</button>
-      <button class="filter-btn" onclick="setFilter('current',this)">Güncel</button>
-      <button class="filter-btn" onclick="setFilter('history',this)">Geçmiş Var</button>
-      <button class="filter-btn" onclick="setFilter('pending',this)">Bekleyen</button>
+
+  <!-- İçerik (başta gizli) -->
+  <div class="content-area" id="contentArea" style="display:none; margin-top:24px;">
+
+    <div class="stats" id="statsRow">
+      <div class="stat"><div class="stat-label">Toplam</div><div class="stat-value" id="statTotal">0</div></div>
+      <div class="stat"><div class="stat-label">Güncelleme Var</div><div class="stat-value red" id="statUpdate">0</div></div>
+      <div class="stat"><div class="stat-label">Güncel</div><div class="stat-value green" id="statCurrent">0</div></div>
+      <div class="stat"><div class="stat-label">Geçmiş Var</div><div class="stat-value blue" id="statHistory">0</div></div>
+      <div class="stat"><div class="stat-label">Bekleyen</div><div class="stat-value amber" id="statPending">0</div></div>
     </div>
+
+    <div class="controls">
+      <button class="primary" id="startBtn" onclick="startCheck()">🔍 Tümünü Kontrol Et</button>
+      <button id="stopBtn" onclick="stopCheck()" disabled>⏹ Durdur</button>
+      <button id="exportBtn" onclick="exportExcel()" disabled>⬇️ Excel'e Aktar</button>
+      <button class="danger-btn" onclick="resetAll()">🗑 Sıfırla</button>
+      <div class="filter-btns">
+        <button class="filter-btn active" onclick="setFilter('all',this)">Tümü</button>
+        <button class="filter-btn" onclick="setFilter('update',this)">Güncelleme Var</button>
+        <button class="filter-btn" onclick="setFilter('current',this)">Güncel</button>
+        <button class="filter-btn" onclick="setFilter('history',this)">Geçmiş Var</button>
+        <button class="filter-btn" onclick="setFilter('pending',this)">Bekleyen</button>
+      </div>
+    </div>
+
+    <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+    <div class="progress-label" id="progressLabel"></div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:20%">Standart No</th>
+            <th style="width:22%">Standart Adı</th>
+            <th style="width:10%">Listedeki Tarih</th>
+            <th style="width:48%">Kontrol Sonucu & Versiyon Geçmişi</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="log-box" id="logBox"></div>
   </div>
-  <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
-  <div class="progress-label" id="progressLabel"></div>
-  <div class="table-wrap" id="tableWrap" style="display:none">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:20%">Standart No</th>
-          <th style="width:22%">Standart Adı</th>
-          <th style="width:10%">Listedeki Tarih</th>
-          <th style="width:48%">Kontrol Sonucu & Versiyon Geçmişi</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-  </div>
-  <div class="empty" id="emptyMsg">
-    <div class="empty-icon">🗂️</div>
-    <h3>Henüz dosya yüklenmedi</h3>
-    <p>Excel dosyanızı yükleyerek başlayın</p>
-  </div>
-  <div class="log-box" id="logBox"></div>
+
 </div>
+
 <div class="toast" id="toast"></div>
+
 <script>
 let sessionId=null, standards=[], activeFilter='all', running=false, shouldStop=false;
 
 const ua=document.getElementById('uploadArea');
-ua.addEventListener('dragover',e=>{e.preventDefault();ua.style.borderColor='#4a9eff';});
+ua.addEventListener('dragover',e=>{e.preventDefault();ua.style.borderColor='#3b82f6';});
 ua.addEventListener('dragleave',()=>ua.style.borderColor='');
 ua.addEventListener('drop',e=>{e.preventDefault();ua.style.borderColor='';doUpload(e.dataTransfer.files[0]);});
 function uploadFile(e){doUpload(e.target.files[0]);}
@@ -162,18 +185,14 @@ async function doUpload(file){
     if(data.error){alert('Hata: '+data.error);return;}
     sessionId=data.session_id; standards=data.standards;
     ua.classList.add('loaded');
-    ua.innerHTML=`<div class="upload-icon">✅</div><h2>${file.name}</h2><p>${standards.length} standart yüklendi · Otomatik kontrol için butona basın</p>`;
+    ua.innerHTML=`<h2>${file.name}</h2><p>${standards.length} standart yüklendi</p>`;
+    document.getElementById('mainArea').style.justifyContent='flex-start';
+    document.getElementById('mainArea').style.paddingTop='28px';
+    document.getElementById('contentArea').style.display='block';
     document.getElementById('logBox').style.display='block';
-    show(); toast(`✓ ${standards.length} standart yüklendi`);
+    renderTable(); updateStats();
+    toast(`✓ ${standards.length} standart yüklendi`);
   } catch(e){alert('Yükleme hatası: '+e.message);}
-}
-
-function show(){
-  document.getElementById('statsRow').style.display='grid';
-  document.getElementById('controlsRow').style.display='flex';
-  document.getElementById('tableWrap').style.display='block';
-  document.getElementById('emptyMsg').style.display='none';
-  renderTable();updateStats();
 }
 
 function buildResultHtml(s){
@@ -215,13 +234,13 @@ function renderTable(){
     return true;
   });
   const body=document.getElementById('tableBody');
-  if(!filtered.length){body.innerHTML=`<tr><td colspan="4" style="text-align:center;padding:40px;color:#aaa">Bu filtrede sonuç yok</td></tr>`;return;}
+  if(!filtered.length){body.innerHTML=`<tr><td colspan="4" style="text-align:center;padding:40px;color:#333">Bu filtrede sonuç yok</td></tr>`;return;}
   body.innerHTML=filtered.map(s=>{
     const rc=s.status==='update'?'row-update':s.status==='current'?'row-current':'';
     return `<tr class="${rc}">
       <td><div class="std-code">${esc(s.no)}</div></td>
       <td><div class="std-name">${esc(s.name)}</div></td>
-      <td style="font-size:12px;color:#888">${esc(s.tarih)}</td>
+      <td style="font-size:12px;color:#555">${esc(s.tarih)}</td>
       <td>${buildResultHtml(s)}</td>
     </tr>`;
   }).join('');
@@ -242,39 +261,27 @@ async function startCheck(){
   document.getElementById('stopBtn').disabled=false;
   document.getElementById('progressWrap').style.display='block';
   document.getElementById('progressLabel').style.display='block';
-
   const pending=standards.map((s,i)=>({...s,_idx:i})).filter(s=>s.status==='pending');
   let done=0;
-
   for(const s of pending){
     if(shouldStop){log(`<span class="warn">⏹ Durduruldu (${done}/${pending.length})</span>`);break;}
-    standards[s._idx].status='checking';
-    renderTable();updateStats();
+    standards[s._idx].status='checking'; renderTable(); updateStats();
     updateProgress(done,pending.length,s.no);
-
     try{
-      const res=await fetch('/check_one',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({session_id:sessionId,idx:s._idx})
-      });
+      const res=await fetch('/check_one',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sessionId,idx:s._idx})});
       const data=await res.json();
       if(data.error) throw new Error(data.error);
       standards[s._idx]={...standards[s._idx],...data.standard};
       const icon=standards[s._idx].status==='current'?'✅':standards[s._idx].status==='update'?'⚠️':'❓';
       log(`${icon} ${s.no}${standards[s._idx].currentVer?' → '+standards[s._idx].currentVer:''}`);
-    } catch(err){
+    }catch(err){
       standards[s._idx].status='unknown';
       standards[s._idx].note='Hata: '+err.message;
       log(`<span class="err">✗</span> ${s.no} — ${err.message}`);
     }
-
-    done++;
-    updateProgress(done,pending.length,'');
-    renderTable();updateStats();
+    done++; updateProgress(done,pending.length,''); renderTable(); updateStats();
     if(done<pending.length&&!shouldStop) await sleep(1200);
   }
-
   running=false;
   document.getElementById('startBtn').disabled=false;
   document.getElementById('stopBtn').disabled=true;
@@ -283,8 +290,8 @@ async function startCheck(){
   document.getElementById('progressWrap').style.display='none';
   const upd=standards.filter(s=>s.status==='update').length;
   const cur=standards.filter(s=>s.status==='current').length;
-  log(`<span class="ok">✓ Tamamlandı</span> — ${upd} güncelleme var · ${cur} güncel`);
-  toast(`Kontrol tamamlandı: ${upd} güncelleme, ${cur} güncel`);
+  log(`<span class="ok">✓ Tamamlandı</span> — ${upd} güncelleme · ${cur} güncel`);
+  toast(`Tamamlandı: ${upd} güncelleme, ${cur} güncel`);
 }
 
 function stopCheck(){shouldStop=true;document.getElementById('stopBtn').disabled=true;}
@@ -292,9 +299,7 @@ function stopCheck(){shouldStop=true;document.getElementById('stopBtn').disabled
 function updateProgress(done,total,current){
   const pct=total>0?Math.round((done/total)*100):0;
   document.getElementById('progressBar').style.width=pct+'%';
-  document.getElementById('progressLabel').textContent=current
-    ?`Kontrol ediliyor: ${current} (${done}/${total})`
-    :`Tamamlandı: ${done}/${total}`;
+  document.getElementById('progressLabel').textContent=current?`Kontrol ediliyor: ${current} (${done}/${total})`:`Tamamlandı: ${done}/${total}`;
 }
 
 async function exportExcel(){
@@ -316,14 +321,13 @@ function setFilter(f,btn){
 function resetAll(){
   if(!confirm('Sıfırlanacak. Emin misiniz?')) return;
   sessionId=null; standards=[];
-  ['statsRow','controlsRow','tableWrap','logBox','progressWrap','progressLabel'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.style.display='none';
-  });
+  document.getElementById('contentArea').style.display='none';
   document.getElementById('logBox').innerHTML='';
-  document.getElementById('emptyMsg').style.display='block';
+  document.getElementById('mainArea').style.justifyContent='center';
+  document.getElementById('mainArea').style.paddingTop='32px';
   const ua=document.getElementById('uploadArea');
   ua.classList.remove('loaded');
-  ua.innerHTML=`<input type="file" id="fileInput" accept=".xlsx,.xls" onchange="uploadFile(event)" style="display:none"><div class="upload-icon">📂</div><h2>Excel dosyanızı buraya tıklayın veya sürükleyin</h2><p>Standart NO sütunu otomatik algılanır · .xlsx ve .xls desteklenir</p>`;
+  ua.innerHTML=`<input type="file" id="fileInput" accept=".xlsx,.xls" onchange="uploadFile(event)" style="display:none"><h2>Excel dosyanızı buraya sürükleyin veya tıklayın</h2><p>.xlsx · .xls · Standart NO sütunu otomatik algılanır</p>`;
   ua.onclick=()=>document.getElementById('fileInput').click();
 }
 
