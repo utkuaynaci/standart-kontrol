@@ -101,29 +101,11 @@ def check_one():
     else:
         src = 'TSE (tse.org.tr)'
 
-    prompt = f"""Sen bir standartlar uzmanısın. Aşağıdaki standart için web'de arama yaparak güncellik kontrolü yap.
+    prompt = f"""Standart güncellik kontrolü. SADECE JSON döndür.
 
-Standart kodu: "{clean_no}"
-Standart adı: "{s['name']}"
-Bizim listedeki tarih/versiyon: "{s['tarih'] or 'belirtilmemiş'}"
-Resmi kaynak: {src}
+Standart: "{clean_no}" | Bizim tarihimiz: "{s['tarih'] or '?'}" | Kaynak: {src}
 
-ÖNEMLİ: Eğer bu standart iptal edilerek yeni bir kodla değiştirildiyse bunu da belirt.
-
-Görevler:
-1. Bu standartın TÜM versiyon geçmişini bul
-2. En güncel versiyonu belirle  
-3. Bizim tarihimizden sonra yeni versiyon var mı?
-
-SADECE JSON formatında yanıt ver, başka hiçbir şey yazma:
-{{
-  "durum": "güncel" veya "güncelleme_var" veya "iptal_yerine_yeni_var" veya "bulunamadı",
-  "guncel_versiyon": "örn: 2024",
-  "yerine_gecen": "varsa yeni standart kodu, yoksa null",
-  "aciklama": "maksimum 2 cümle Türkçe açıklama",
-  "versiyon_gecmisi": [{{"year":"1998","not":"İlk yayın"}},{{"year":"2020","not":"Güncelleme"}}],
-  "kaynak_url": "varsa URL, yoksa null"
-}}"""
+{{"durum":"güncel"/"güncelleme_var"/"iptal_yerine_yeni_var"/"bulunamadı","guncel_versiyon":"yıl","yerine_gecen":"kod veya null","aciklama":"1 cümle Türkçe","versiyon_gecmisi":[{{"year":"yıl","not":"açıklama"}}],"kaynak_url":"url veya null"}}"""
 
     try:
         res = requests.post(
@@ -135,7 +117,7 @@ SADECE JSON formatında yanıt ver, başka hiçbir şey yazma:
             },
             json={
                 'model': 'claude-haiku-4-5',
-                'max_tokens': 600,
+                'max_tokens': 400,
                 'tools': [{'type': 'web_search_20250305', 'name': 'web_search', 'max_uses': 1}],
                 'messages': [{'role': 'user', 'content': prompt}]
             },
