@@ -1,15 +1,28 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, session, redirect, url_for
 import pandas as pd
 import json
 import io
 import os
+import re
 import requests
 from datetime import datetime
+from functools import wraps
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'standart-gizli-anahtar-2024')
 standards_store = {}
 
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
+APP_USERNAME = os.environ.get('APP_USERNAME', 'admin')
+APP_PASSWORD = os.environ.get('APP_PASSWORD', 'admin123')
+
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not session.get('logged_in'):
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated
 
 def parse_excel(file):
     df = pd.read_excel(file, header=None)
@@ -95,8 +108,6 @@ def check_one():
         return jsonify({'error': 'Oturum bulunamadı'}), 404
 
     s = standards_store[session_id][idx]
-    # Standart kodunu temizle - parantez içi ekleri kaldır
-    import re
     clean_no = re.sub(r'\s*\([^)]*\)', '', s['no']).strip()
     up = clean_no.upper()
 
@@ -148,19 +159,12 @@ Standart: "{clean_no}" | Bizim tarihimiz: "{s['tarih'] or '?'}" | Kaynak: {src}
 
         result = res.json()
         text = ''.join(b['text'] for b in result['content'] if b['type'] == 'text')
-
-        # cite tag'lerini ve sistem etiketlerini temizle
-        import re
-        text = re.sub(r'<cite[^>]*>', '', text)
-        text = re.sub(r'</cite>', '', text)
         text = re.sub(r'<[^>]+>', '', text)
-
         clean = text.replace('```json', '').replace('```', '').strip()
-
-        # JSON bloğunu metinden çıkar
         json_match = re.search(r'\{[\s\S]*\}', clean)
         if json_match:
             clean = json_match.group(0)
+
         try:
             parsed = json.loads(clean)
         except:
@@ -190,11 +194,11 @@ Standart: "{clean_no}" | Bizim tarihimiz: "{s['tarih'] or '?'}" | Kaynak: {src}
                 'history': parsed.get('versiyon_gecmisi', []),
                 'url': parsed.get('kaynak_url') or ''
             })
-            return jsonify({'ok': True, 'standard': standards_store[session_id][idx]})
         else:
             standards_store[session_id][idx]['status'] = 'unknown'
             standards_store[session_id][idx]['note'] = 'Yanıt ayrıştırılamadı'
-            return jsonify({'ok': True, 'standard': standards_store[session_id][idx]})
+
+        return jsonify({'ok': True, 'standard': standards_store[session_id][idx]})
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
