@@ -132,8 +132,8 @@ SADECE JSON formatında yanıt ver, başka hiçbir şey yazma:
             },
             json={
                 'model': 'claude-haiku-4-5',
-                'max_tokens': 800,
-                'tools': [{'type': 'web_search_20250305', 'name': 'web_search'}],
+                'max_tokens': 600,
+                'tools': [{'type': 'web_search_20250305', 'name': 'web_search', 'max_uses': 1}],
                 'messages': [{'role': 'user', 'content': prompt}]
             },
             timeout=30
