@@ -51,11 +51,28 @@ def parse_excel(file):
         })
     return records
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        if request.form['username'] == APP_USERNAME and request.form['password'] == APP_PASSWORD:
+            session['logged_in'] = True
+            return redirect(url_for('index'))
+        error = 'Kullanıcı adı veya şifre hatalı'
+    return render_template('login.html', error=error)
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
 @app.route('/')
+@login_required
 def index():
     return render_template('index.html')
 
 @app.route('/upload', methods=['POST'])
+@login_required
 def upload():
     if 'file' not in request.files:
         return jsonify({'error': 'Dosya bulunamadı'}), 400
@@ -69,6 +86,7 @@ def upload():
         return jsonify({'error': str(e)}), 400
 
 @app.route('/check_one', methods=['POST'])
+@login_required
 def check_one():
     data = request.json
     session_id = data.get('session_id')
@@ -182,6 +200,7 @@ Standart: "{clean_no}" | Bizim tarihimiz: "{s['tarih'] or '?'}" | Kaynak: {src}
         return jsonify({'error': str(e)}), 500
 
 @app.route('/update', methods=['POST'])
+@login_required
 def update():
     data = request.json
     session_id = data.get('session_id')
@@ -195,6 +214,7 @@ def update():
     return jsonify({'ok': True})
 
 @app.route('/export', methods=['POST'])
+@login_required
 def export():
     data = request.json
     session_id = data.get('session_id')
