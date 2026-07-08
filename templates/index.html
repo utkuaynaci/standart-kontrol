@@ -1,98 +1,155 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Standart Denetleyici</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e3; min-height: 100vh; display: flex; flex-direction: column; }
+  :root[data-theme="dark"] {
+    --bg: #0f0f0f;
+    --topbar: #1a1a1a;
+    --topbar-border: #2a2a2a;
+    --card: #1a1a1a;
+    --card2: #141414;
+    --border: #2a2a2a;
+    --border2: #222;
+    --text: #e5e5e3;
+    --text2: #aaa;
+    --text3: #666;
+    --text4: #555;
+    --muted: #333;
+    --input-bg: #0f0f0f;
+    --hover: #1f1f1f;
+    --row-update: #1f0f0f;
+    --row-current: #0f1a0f;
+    --log-bg: #0a0a0a;
+    --badge-pending-bg: #1f1f1f; --badge-pending-c: #555; --badge-pending-b: #2a2a2a;
+    --badge-check-bg: #1a1f2e;   --badge-check-c: #3b82f6; --badge-check-b: #1e3a5f;
+    --badge-cur-bg: #0f1a0f;     --badge-cur-c: #22c55e;   --badge-cur-b: #1a3a1a;
+    --badge-upd-bg: #1f0f0f;     --badge-upd-c: #ef4444;   --badge-upd-b: #3f1f1f;
+    --badge-unk-bg: #1f1a0f;     --badge-unk-c: #f59e0b;   --badge-unk-b: #3f2f0f;
+    --toggle-bg: #2a2a2a; --toggle-c: #888;
+    --dot: #333; --dot-b: #444;
+    --line: #2a2a2a;
+    --shadow: rgba(0,0,0,0.4);
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f5f3;
+    --topbar: #1a1a18;
+    --topbar-border: #111;
+    --card: #fff;
+    --card2: #f8f8f6;
+    --border: #e5e5e3;
+    --border2: #f0f0ee;
+    --text: #1a1a18;
+    --text2: #444;
+    --text3: #888;
+    --text4: #666;
+    --muted: #ccc;
+    --input-bg: #fff;
+    --hover: #fafaf8;
+    --row-update: #fff8f8;
+    --row-current: #f8fff8;
+    --log-bg: #1a1a18;
+    --badge-pending-bg: #f5f5f3; --badge-pending-c: #888; --badge-pending-b: #e5e5e3;
+    --badge-check-bg: #eff6ff;   --badge-check-c: #3b82f6; --badge-check-b: #bfdbfe;
+    --badge-cur-bg: #f0fdf4;     --badge-cur-c: #22c55e;   --badge-cur-b: #bbf7d0;
+    --badge-upd-bg: #fef2f2;     --badge-upd-c: #ef4444;   --badge-upd-b: #fca5a5;
+    --badge-unk-bg: #fffbeb;     --badge-unk-c: #d97706;   --badge-unk-b: #fde68a;
+    --toggle-bg: #f0f0ee; --toggle-c: #666;
+    --dot: #d1d5db; --dot-b: #9ca3af;
+    --line: #e5e7eb;
+    --shadow: rgba(0,0,0,0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.2s, color 0.2s, border-color 0.2s; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 
-  .topbar { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 14px 32px; display: flex; align-items: center; gap: 12px; }
+  .topbar { background: var(--topbar); border-bottom: 1px solid var(--topbar-border); padding: 14px 32px; display: flex; align-items: center; gap: 12px; }
   .topbar-icon { width: 28px; height: 28px; background: #3b82f6; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
   .topbar h1 { font-size: 15px; font-weight: 500; color: #e5e5e3; }
-  .logout-btn { margin-left: auto; padding: 5px 12px; border-radius: 6px; border: 1px solid #333; background: transparent; color: #888; font-size: 12px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
-  .logout-btn:hover { border-color: #555; color: #ccc; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .theme-btn { padding: 5px 12px; border-radius: 20px; border: 1px solid var(--topbar-border); background: var(--toggle-bg); color: var(--toggle-c); font-size: 12px; cursor: pointer; font-family: inherit; }
+  .theme-btn:hover { color: var(--text); }
+  .logout-btn { padding: 5px 12px; border-radius: 6px; border: 1px solid #333; background: transparent; color: #888; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .logout-btn:hover { color: #ccc; border-color: #555; }
 
   .main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; }
-
-  .upload-area { border: 2px dashed #333; border-radius: 14px; padding: 48px 60px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 0; width: 100%; max-width: 540px; background: #1a1a1a; }
-  .upload-area:hover { border-color: #3b82f6; background: #1a1f2e; }
-  .upload-area.loaded { border-color: #22c55e; background: #0f1f14; border-style: solid; cursor: default; }
-  .upload-area h2 { font-size: 15px; font-weight: 400; color: #aaa; margin-bottom: 4px; }
-  .upload-area p { font-size: 12px; color: #555; }
+  .upload-area { border: 2px dashed var(--border); border-radius: 14px; padding: 48px 60px; text-align: center; cursor: pointer; transition: all 0.2s; width: 100%; max-width: 540px; background: var(--card); }
+  .upload-area:hover { border-color: #3b82f6; }
+  .upload-area.loaded { border-color: #22c55e; border-style: solid; cursor: default; }
+  .upload-area h2 { font-size: 15px; font-weight: 400; color: var(--text3); margin-bottom: 4px; }
+  .upload-area p { font-size: 12px; color: var(--text4); }
   #fileInput { display: none; }
 
   .content-area { width: 100%; max-width: 1100px; }
 
   .stats { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 16px; }
-  .stat { background: #1a1a1a; border-radius: 10px; padding: 12px 16px; border: 1px solid #2a2a2a; }
-  .stat-label { font-size: 11px; color: #555; margin-bottom: 4px; }
-  .stat-value { font-size: 24px; font-weight: 600; color: #e5e5e3; }
+  .stat { background: var(--card); border-radius: 10px; padding: 12px 16px; border: 1px solid var(--border); }
+  .stat-label { font-size: 11px; color: var(--text4); margin-bottom: 4px; }
+  .stat-value { font-size: 24px; font-weight: 600; color: var(--text); }
   .stat-value.red { color: #ef4444; }
   .stat-value.green { color: #22c55e; }
   .stat-value.amber { color: #f59e0b; }
   .stat-value.blue { color: #3b82f6; }
 
   .controls { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
-  button { padding: 8px 14px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; font-size: 13px; cursor: pointer; font-family: inherit; color: #e5e5e3; transition: all 0.15s; }
-  button:hover:not(:disabled) { background: #252525; border-color: #444; }
+  button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); font-size: 13px; cursor: pointer; font-family: inherit; color: var(--text); transition: all 0.15s; }
+  button:hover:not(:disabled) { background: var(--hover); }
   button:disabled { opacity: 0.3; cursor: not-allowed; }
   button.primary { background: #3b82f6; color: #fff; border-color: #3b82f6; }
   button.primary:hover:not(:disabled) { background: #2563eb; border-color: #2563eb; }
-  button.danger-btn { color: #ef4444; border-color: #3f1f1f; }
-  button.danger-btn:hover:not(:disabled) { background: #1f0f0f; }
+  button.danger-btn { color: #ef4444; border-color: var(--badge-upd-b); }
   .filter-btns { display: flex; gap: 5px; margin-left: auto; flex-wrap: wrap; }
-  .filter-btn { padding: 5px 11px; border-radius: 20px; font-size: 12px; border: 1px solid #2a2a2a; background: #1a1a1a; color: #888; cursor: pointer; }
+  .filter-btn { padding: 5px 11px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border); background: var(--card); color: var(--text3); cursor: pointer; }
   .filter-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
 
-  .progress-wrap { background: #2a2a2a; border-radius: 4px; height: 3px; margin-bottom: 6px; overflow: hidden; display: none; }
+  .progress-wrap { background: var(--border); border-radius: 4px; height: 3px; margin-bottom: 6px; overflow: hidden; display: none; }
   .progress-bar { height: 100%; background: #3b82f6; border-radius: 4px; transition: width 0.3s; }
-  .progress-label { font-size: 12px; color: #555; margin-bottom: 12px; display: none; }
+  .progress-label { font-size: 12px; color: var(--text4); margin-bottom: 12px; display: none; }
 
-  .table-wrap { background: #1a1a1a; border-radius: 12px; border: 1px solid #2a2a2a; overflow: hidden; }
+  .table-wrap { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead th { background: #141414; padding: 9px 14px; text-align: left; font-weight: 500; font-size: 11px; color: #555; border-bottom: 1px solid #2a2a2a; text-transform: uppercase; letter-spacing: .03em; }
-  tbody td { padding: 10px 14px; border-bottom: 1px solid #222; vertical-align: top; }
+  thead th { background: var(--card2); padding: 9px 14px; text-align: left; font-weight: 500; font-size: 11px; color: var(--text4); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: .03em; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border2); vertical-align: top; }
   tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover { background: #1f1f1f; }
-  tbody tr.row-update { background: #1f0f0f; }
-  tbody tr.row-current { background: #0f1a0f; }
+  tbody tr:hover { background: var(--hover); }
+  tbody tr.row-update { background: var(--row-update); }
+  tbody tr.row-current { background: var(--row-current); }
 
-  .std-code { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; font-weight: 600; color: #e5e5e3; }
-  .std-name { font-size: 12px; color: #666; margin-top: 3px; line-height: 1.4; }
+  .std-code { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; font-weight: 600; color: var(--text); }
+  .std-name { font-size: 12px; color: var(--text3); margin-top: 3px; line-height: 1.4; }
 
   .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
-  .badge-pending  { background: #1f1f1f; color: #555; border: 1px solid #2a2a2a; }
-  .badge-checking { background: #1a1f2e; color: #3b82f6; border: 1px solid #1e3a5f; }
-  .badge-current  { background: #0f1a0f; color: #22c55e; border: 1px solid #1a3a1a; }
-  .badge-update   { background: #1f0f0f; color: #ef4444; border: 1px solid #3f1f1f; }
-  .badge-unknown  { background: #1f1a0f; color: #f59e0b; border: 1px solid #3f2f0f; }
+  .badge-pending  { background: var(--badge-pending-bg); color: var(--badge-pending-c); border: 1px solid var(--badge-pending-b); }
+  .badge-checking { background: var(--badge-check-bg);   color: var(--badge-check-c);   border: 1px solid var(--badge-check-b); }
+  .badge-current  { background: var(--badge-cur-bg);     color: var(--badge-cur-c);     border: 1px solid var(--badge-cur-b); }
+  .badge-update   { background: var(--badge-upd-bg);     color: var(--badge-upd-c);     border: 1px solid var(--badge-upd-b); }
+  .badge-unknown  { background: var(--badge-unk-bg);     color: var(--badge-unk-c);     border: 1px solid var(--badge-unk-b); }
 
   .result-box { margin-top: 5px; }
-  .result-ver { font-size: 12px; font-weight: 500; margin-bottom: 3px; color: #ccc; }
-  .result-detail { font-size: 12px; color: #666; line-height: 1.5; margin-bottom: 4px; max-width: 400px; }
+  .result-ver { font-size: 12px; font-weight: 500; margin-bottom: 3px; color: var(--text2); }
+  .result-detail { font-size: 12px; color: var(--text3); line-height: 1.5; margin-bottom: 4px; max-width: 400px; }
   .history-wrap { margin-top: 5px; }
-  .history-title { font-size: 10px; font-weight: 500; color: #555; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .03em; }
+  .history-title { font-size: 10px; font-weight: 500; color: var(--text4); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .03em; }
   .history-timeline { display: flex; flex-wrap: wrap; align-items: center; }
   .history-ver { display: inline-flex; flex-direction: column; align-items: center; }
   .history-dot-wrap { display: flex; align-items: center; }
-  .history-dot { width: 8px; height: 8px; border-radius: 50%; background: #333; border: 2px solid #444; flex-shrink: 0; }
+  .history-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dot); border: 2px solid var(--dot-b); flex-shrink: 0; }
   .history-dot.latest { background: #3b82f6; border-color: #2563eb; }
   .history-dot.ours   { background: #f59e0b; border-color: #d97706; }
-  .history-line { width: 16px; height: 2px; background: #2a2a2a; }
-  .history-label { font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap; }
-  .history-label.bold { color: #aaa; font-weight: 600; }
+  .history-line { width: 16px; height: 2px; background: var(--line); }
+  .history-label { font-size: 10px; color: var(--text4); margin-top: 2px; white-space: nowrap; }
+  .history-label.bold { color: var(--text2); font-weight: 600; }
   .result-link { font-size: 12px; color: #3b82f6; text-decoration: none; display: inline-block; margin-top: 3px; }
   .result-link:hover { text-decoration: underline; }
 
-  .log-box { background: #0a0a0a; color: #555; font-family: monospace; font-size: 12px; padding: 12px 16px; border-radius: 8px; margin-top: 12px; max-height: 130px; overflow-y: auto; display: none; line-height: 1.9; border: 1px solid #1a1a1a; }
+  .log-box { background: var(--log-bg); color: var(--text4); font-family: monospace; font-size: 12px; padding: 12px 16px; border-radius: 8px; margin-top: 12px; max-height: 130px; overflow-y: auto; display: none; line-height: 1.9; border: 1px solid var(--border); }
   .log-box .ok   { color: #22c55e; }
   .log-box .warn { color: #f59e0b; }
   .log-box .err  { color: #ef4444; }
   .log-box .info { color: #3b82f6; }
 
-  .toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a1a; border: 1px solid #2a2a2a; color: #e5e5e3; padding: 12px 18px; border-radius: 10px; font-size: 13px; display: none; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 12px 18px; border-radius: 10px; font-size: 13px; display: none; z-index: 200; box-shadow: 0 8px 24px var(--shadow); }
 
   @media (max-width:700px) {
     .stats { grid-template-columns: repeat(2,1fr); }
@@ -107,29 +164,27 @@
 <div class="topbar">
   <div class="topbar-icon">📋</div>
   <h1>Standart Denetleyici</h1>
-  <button class="logout-btn" onclick="window.location='/logout'">Çıkış</button>
+  <div class="topbar-right">
+    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">☀️ Açık</button>
+    <button class="logout-btn" onclick="window.location='/logout'">Çıkış</button>
+  </div>
 </div>
 
 <div class="main" id="mainArea">
-
-  <!-- Upload -->
   <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
     <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="uploadFile(event)">
-    <h2>Excel dosyanızı buraya sürükleyin veya yüklemek için tıklayın</h2>
+    <h2>Excel dosyanızı buraya sürükleyin veya tıklayın</h2>
     <p>.xlsx · .xls · Standart NO sütunu otomatik algılanır</p>
   </div>
 
-  <!-- İçerik (başta gizli) -->
   <div class="content-area" id="contentArea" style="display:none; margin-top:24px;">
-
-    <div class="stats" id="statsRow">
+    <div class="stats">
       <div class="stat"><div class="stat-label">Toplam</div><div class="stat-value" id="statTotal">0</div></div>
       <div class="stat"><div class="stat-label">Güncelleme Var</div><div class="stat-value red" id="statUpdate">0</div></div>
       <div class="stat"><div class="stat-label">Güncel</div><div class="stat-value green" id="statCurrent">0</div></div>
       <div class="stat"><div class="stat-label">Geçmiş Var</div><div class="stat-value blue" id="statHistory">0</div></div>
       <div class="stat"><div class="stat-label">Bekleyen</div><div class="stat-value amber" id="statPending">0</div></div>
     </div>
-
     <div class="controls">
       <button class="primary" id="startBtn" onclick="startCheck()">🔍 Tümünü Kontrol Et</button>
       <button id="stopBtn" onclick="stopCheck()" disabled>⏹ Durdur</button>
@@ -143,10 +198,8 @@
         <button class="filter-btn" onclick="setFilter('pending',this)">Bekleyen</button>
       </div>
     </div>
-
     <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
     <div class="progress-label" id="progressLabel"></div>
-
     <div class="table-wrap">
       <table>
         <thead>
@@ -160,15 +213,27 @@
         <tbody id="tableBody"></tbody>
       </table>
     </div>
-
     <div class="log-box" id="logBox"></div>
   </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+// Tema
+const savedTheme = localStorage.getItem('theme') || 'dark';
+setTheme(savedTheme);
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  const btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = t === 'dark' ? '☀️ Açık' : '🌙 Koyu';
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  setTheme(current === 'dark' ? 'light' : 'dark');
+}
+
 let sessionId=null, standards=[], activeFilter='all', running=false, shouldStop=false;
 
 const ua=document.getElementById('uploadArea');
@@ -234,13 +299,13 @@ function renderTable(){
     return true;
   });
   const body=document.getElementById('tableBody');
-  if(!filtered.length){body.innerHTML=`<tr><td colspan="4" style="text-align:center;padding:40px;color:#333">Bu filtrede sonuç yok</td></tr>`;return;}
+  if(!filtered.length){body.innerHTML=`<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text4)">Bu filtrede sonuç yok</td></tr>`;return;}
   body.innerHTML=filtered.map(s=>{
     const rc=s.status==='update'?'row-update':s.status==='current'?'row-current':'';
     return `<tr class="${rc}">
       <td><div class="std-code">${esc(s.no)}</div></td>
       <td><div class="std-name">${esc(s.name)}</div></td>
-      <td style="font-size:12px;color:#555">${esc(s.tarih)}</td>
+      <td style="font-size:12px;color:var(--text4)">${esc(s.tarih)}</td>
       <td>${buildResultHtml(s)}</td>
     </tr>`;
   }).join('');
