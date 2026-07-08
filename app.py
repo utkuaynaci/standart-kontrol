@@ -77,7 +77,10 @@ def check_one():
         return jsonify({'error': 'Oturum bulunamadı'}), 404
 
     s = standards_store[session_id][idx]
-    up = s['no'].upper()
+    # Standart kodunu temizle - parantez içi ekleri kaldır
+    import re
+    clean_no = re.sub(r'\s*\([^)]*\)', '', s['no']).strip()
+    up = clean_no.upper()
 
     if 'ISO' in up:
         src = 'ISO (iso.org)'
@@ -100,7 +103,7 @@ def check_one():
 
     prompt = f"""Sen bir standartlar uzmanısın. Aşağıdaki standart için web'de arama yaparak güncellik kontrolü yap.
 
-Standart kodu: "{s['no']}"
+Standart kodu: "{clean_no}"
 Standart adı: "{s['name']}"
 Bizim listedeki tarih/versiyon: "{s['tarih'] or 'belirtilmemiş'}"
 Resmi kaynak: {src}
